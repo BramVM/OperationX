@@ -46,7 +46,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\attachBlock.js" />
+     <Compile Include="Assets\buildingMode.js" />
+     <Compile Include="Assets\cameraMovement.js" />
+     <Compile Include="Assets\playerProperties.js" />
      <Compile Include="Assets\thrust.js" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
