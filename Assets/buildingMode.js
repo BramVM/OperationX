@@ -1,15 +1,99 @@
 ﻿#pragma strict
 import System.Linq;
 import System.Collections.Generic;
+import System;
+import System.Runtime.Serialization.Formatters.Binary;
+import System.IO;
+
 public var player : GameObject;
+public var sourceBlock : GameObject;
 public var newBlock : GameObject;
 public var placeHolder : GameObject;
 public var blockHeight : float;
 public var breakForce : float;
 public var breakTorque : float;
 public var buildingMode : boolean = true;
+public var building = new Array();
 private var joint: FixedJoint;
 
+public var blankBlockName : String;
+public var sourceBlockName : String;
+
+function saveBuiling(){
+	//format Data
+	var buildingBlocks: GameObject[];
+	buildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	var buildingBlock = new Array();
+	for(var i : int = 0; i < buildingBlocks.length; i++){
+		//type
+		if(buildingBlocks[i].name == sourceBlockName ){
+			buildingBlock[0]=0;
+		}
+		if(buildingBlocks[i].name == blankBlockName ){
+			buildingBlock[0]=1;
+		}
+		//positon x
+		buildingBlock[1]=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.x/blockHeight);
+		Debug.Log(buildingBlock[1]);
+		//positon y
+		buildingBlock[2]=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.y/blockHeight);
+		//positon z
+		buildingBlock[3]=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.z/blockHeight);
+		//add to building data
+		building[i]=buildingBlock;
+	}
+	//save data
+	var bf : BinaryFormatter = new BinaryFormatter();
+	var file : FileStream;
+	if(File.Exists(Application.persistentDataPath + "/building.dat")){
+		file = File.Open(Application.persistentDataPath + "/building.dat", FileMode.Open);
+	}
+	else{
+		file = File.Create(Application.persistentDataPath + "/building.dat");
+	}
+	bf.Serialize(file,building);
+	file.Close();
+}
+
+function loadBuiling(){
+	if(File.Exists(Application.persistentDataPath + "/building.dat")){
+		var bf : BinaryFormatter = new BinaryFormatter();
+		var file : FileStream = File.Open(Application.persistentDataPath + "/building.dat", FileMode.Open);
+		building = bf.Deserialize(file);
+		buildFromData();
+	}
+}
+
+function buildFromData(){
+	var blockInstance: GameObject;
+	for(var i : int = 0; i < building.length; i++){
+		var buildingBlock = new Array();
+		buildingBlock=building[i];
+		var intValue : int;
+		var blockPosition : Vector3;
+		//positon x
+		intValue = buildingBlock[1];
+		Debug.Log(buildingBlock[1]);
+		blockPosition.x=intValue*blockHeight;
+		//positon y
+		intValue = buildingBlock[2];
+		blockPosition.y=intValue*blockHeight;
+		//positon z
+		intValue = buildingBlock[3];
+		blockPosition.z=intValue*blockHeight;
+		
+		switch (buildingBlock[0]){
+			case 0:
+				blockInstance = Instantiate(sourceBlock,blockPosition, player.transform.rotation)as GameObject;
+				blockInstance.transform.SetParent(player.transform,false);
+				break;
+			case 1:
+				blockInstance = Instantiate(newBlock,blockPosition, player.transform.rotation)as GameObject;
+				blockInstance.transform.SetParent(player.transform,false);
+				break;
+		}
+	}
+}
 
 function enterBuildingMode(){
 	Debug.Log("buildingMode");
@@ -33,18 +117,25 @@ function exitBuildingMode(){
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = false;
 	}
 }
-function removePlaceholders()
-	{
-		var placeholders: GameObject[];
-		placeholders = player.FindGameObjectsWithTag ("placeholder");
-		for(var i : int = 0; i < placeholders.length; i++)
-		{
-			Destroy (placeholders[i]);
-		}
-	}
 
-function Update ()
-{	
+function removePlaceholders(){
+	var placeholders: GameObject[];
+	placeholders = player.FindGameObjectsWithTag ("placeholder");
+	for(var i : int = 0; i < placeholders.length; i++)
+	{
+		Destroy (placeholders[i]);
+	}
+}
+function Start(){
+	var blockInstance: GameObject;
+	var initPosition: Vector3;
+	initPosition.x=0;
+	initPosition.y=6;
+	initPosition.z=0;
+	blockInstance = Instantiate(sourceBlock,initPosition, player.transform.rotation)as GameObject;
+	blockInstance.transform.SetParent(player.transform,false);
+}
+function Update (){	
 	if(buildingMode){
 		removePlaceholders();
 		var ray = Camera.main.ScreenPointToRay (Input.mousePosition);

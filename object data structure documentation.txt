@@ -1,0 +1,17 @@
+Format to save your creations is an array in an array to compress datatrafic.
+the script reads an array of blocks. Each block has 5 propertys as an int
+
+[[type,x,y,z,orientation]]
+
+Type: type of block as int, script knows wich int is wich block
+x: position of block on x axe. (center block has 0, the block next to it has 1 or -1)
+y: position of block on y axe.
+z: position of block on z axe.
+orientation: can be 0,1,2,3,4 or 5. 
+	
+	0 doesn't rotate the block
+	1 rotates 180° over x
+	2 rotates 90° over x
+	3 rotates -90° over x
+	4 rotates 90° over y
+	5 rotates -90°over y
