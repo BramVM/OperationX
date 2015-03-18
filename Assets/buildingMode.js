@@ -5,6 +5,16 @@ import System;
 import System.Runtime.Serialization.Formatters.Binary;
 import System.IO;
 
+//[Serializable]
+public class blockData{
+	var type : int;
+	var x : int;
+	var y : int;
+	var z : int;
+}
+public	var buildingBlocks = new List.<blockData>();
+
+
 public var player : GameObject;
 public var sourceBlock : GameObject;
 public var newBlock : GameObject;
@@ -13,78 +23,71 @@ public var blockHeight : float;
 public var breakForce : float;
 public var breakTorque : float;
 public var buildingMode : boolean = true;
-public var building : buildingData;
 private var joint: FixedJoint;
 
 public var blankBlockName : String;
 public var sourceBlockName : String;
 
-//[Serializable]
-public class blockData{
-	var type : int;
-	var x : int;
-	var y : int;
-	var z : int;
-}
-public class buildingData{
-	var buildingBlocks = new List.<blockData>();
-}
-
 function saveBuiling(){
+	var test = new List.<int>();
+	for(var k : int = 0; k < 5; k++){
+		test.Add(k);
+		Debug.Log(k + ' ' + test[k]);
+	}
+	for(var l : int = 0; l < test.Count; l++){
+		Debug.Log(l + ' ' + test[l]);
+	}
 	//format Data
-	var buildingBlocks: GameObject[];
-	buildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
-	var buildingBlock : blockData;
-	for(var i : int = 0; i < buildingBlocks.length; i++){
+	var taggedBuildingBlocks: GameObject[];
+	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	var buildingBlock = new blockData();
+	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
+		buildingBlocks.Add(buildingBlock);
 		//type
-		if(buildingBlocks[i].name == sourceBlockName ){
-			buildingBlock.type=0;
+		if(taggedBuildingBlocks[i].name == sourceBlockName ){
+			buildingBlocks[i].type=0;
 		}
-		if(buildingBlocks[i].name == blankBlockName ){
-			buildingBlock.type=1;
+		if(taggedBuildingBlocks[i].name == blankBlockName ){
+			buildingBlocks[i].type=1;
 		}
 		//positon x
-		var buildingBlock.x=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.x/blockHeight);
-		Debug.Log(buildingBlock.x);
+		buildingBlocks[i].x=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x/blockHeight);
 		//positon y
-		buildingBlock.y=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.y/blockHeight);
+		buildingBlocks[i].y=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y/blockHeight);
 		//positon z
-		buildingBlock.z=Mathf.FloorToInt(buildingBlocks[i].GetComponent.<Rigidbody>().position.z/blockHeight);
-		//add to building data
-		building.buildingBlocks.Add(buildingBlock);
+		buildingBlocks[i].z=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z/blockHeight);
+		Debug.Log(i + ' ' + buildingBlocks[i].x);
+	}
+	for(var j : int = 0; j < buildingBlocks.Count; j++){
+		Debug.Log(j + ' ' + buildingBlocks[j].x);
 	}
 	//save data
-	//var bf : BinaryFormatter = new BinaryFormatter();
-	//var file : FileStream;
-	//if(File.Exists(Application.persistentDataPath + "/building.dat")){
-	//	file = File.Open(Application.persistentDataPath + "/building.dat", FileMode.Open);
-	//}
-	//else{
-	//	file = File.Create(Application.persistentDataPath + "/building.dat");
-	//}
-	//bf.Serialize(file,building);
-	//file.Close();
-	var buildingBlock2 : blockData;
-	for(var j : int = 0; j < building.buildingBlocks.Count; j++){
-		buildingBlock2=building.buildingBlocks[j];
-		Debug.Log("hello" + buildingBlock2.x);
+	var bf : BinaryFormatter = new BinaryFormatter();
+	var file : FileStream;
+	if(File.Exists(Application.persistentDataPath + "/building.dat")){
+		file = File.Open(Application.persistentDataPath + "/building.dat", FileMode.Open);
 	}
+	else{
+		file = File.Create(Application.persistentDataPath + "/building.dat");
+	}
+	bf.Serialize(file,buildingBlocks);
+	file.Close();
 }
 
 function loadBuiling(){
 	if(File.Exists(Application.persistentDataPath + "/building.dat")){
 		var bf : BinaryFormatter = new BinaryFormatter();
 		var file : FileStream = File.Open(Application.persistentDataPath + "/building.dat", FileMode.Open);
-		building = bf.Deserialize(file);
+		buildingBlocks = bf.Deserialize(file);
 		buildFromData();
 	}
 }
 
 function buildFromData(){
 	var blockInstance: GameObject;
-	var buildingBlock : blockData;
-	for(var i : int = 0; i < building.buildingBlocks.Count; i++){
-		buildingBlock=building.buildingBlocks[i];
+	var buildingBlock = new blockData();
+	for(var i : int = 0; i < buildingBlocks.Count; i++){
+		buildingBlock=buildingBlocks[i];
 		var intValue : int;
 		var blockPosition : Vector3;
 		//positon x
