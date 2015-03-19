@@ -49,6 +49,7 @@
      <Compile Include="Assets\NewBehaviourScript.js" />
      <Compile Include="Assets\buildingMode.js" />
      <Compile Include="Assets\cameraMovement.js" />
+     <Compile Include="Assets\hexaWorldGenerator.js" />
      <Compile Include="Assets\playerProperties.js" />
      <Compile Include="Assets\test list.js" />
      <Compile Include="Assets\thrust.js" />
