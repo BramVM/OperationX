@@ -1,9 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\buildingMode.js">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\hexaWorldGenerator.js">
     <Files>
-      <File FileName="Assets\buildingMode.js" Line="213" Column="126" />
-      <File FileName="Assets\hexaWorldGenerator.js" Line="106" Column="3" />
+      <File FileName="Assets\hexaWorldGenerator.js" Line="66" Column="88" />
+      <File FileName="Assets\buildingMode.js" Line="195" Column="36" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

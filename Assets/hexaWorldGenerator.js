@@ -22,6 +22,7 @@ private var grid_z : float;
  
 function Start () {
 	var grid_z = Mathf.Sqrt((Mathf.Pow((grid_x*2), 2)-Mathf.Pow((grid_x), 2)));
+	var tileScale = grid_x * 1.15470041009; //<--THIS NUMBER NEEDS TRUE VALUE
 	Debug.Log(grid_z);
 	/*get player position*/
 	var playerPos_x = target.transform.position.x;
@@ -57,34 +58,41 @@ function Start () {
 	}
 	//create mid tile
 	midTileInstance = Instantiate(tile,midTilePosition,tile.transform.rotation )as GameObject;
+	midTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create right tile
 	rightTilePosition = midTilePosition;
 	rightTilePosition.x = rightTilePosition.x+2*grid_x;
 	rightTileInstance = Instantiate(tile,rightTilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create left tile
 	leftTilePosition = midTilePosition;
 	leftTilePosition.x = leftTilePosition.x-2*grid_x;
 	leftTileInstance = Instantiate(tile,leftTilePosition,tile.transform.rotation )as GameObject;
+	leftTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create top right tile
 	topRightTilePosition = midTilePosition;
 	topRightTilePosition.x = topRightTilePosition.x+grid_x;
 	topRightTilePosition.z = topRightTilePosition.z+grid_z;
 	topRightTileInstance = Instantiate(tile,topRightTilePosition,tile.transform.rotation )as GameObject;
+	topRightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create top left tile
 	topLeftTilePosition = midTilePosition;
 	topLeftTilePosition.x = topLeftTilePosition.x-grid_x;
 	topLeftTilePosition.z = topLeftTilePosition.z+grid_z;
 	topLeftTileInstance = Instantiate(tile,topLeftTilePosition,tile.transform.rotation )as GameObject;
+	topLeftTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create bottom right tile
 	bottomRightTilePosition = midTilePosition;
 	bottomRightTilePosition.x = bottomRightTilePosition.x+grid_x;
 	bottomRightTilePosition.z = bottomRightTilePosition.z-grid_z;
 	bottomRightTileInstance = Instantiate(tile,bottomRightTilePosition,tile.transform.rotation )as GameObject;
+	bottomRightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	//create bottom left tile
 	bottomLeftTilePosition = midTilePosition;
 	bottomLeftTilePosition.x = bottomLeftTilePosition.x-grid_x;
 	bottomLeftTilePosition.z = bottomLeftTilePosition.z-grid_z;
 	bottomLeftTileInstance = Instantiate(tile,bottomLeftTilePosition,tile.transform.rotation )as GameObject;
+	bottomLeftTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 }
 function Update () {
 	//if closest tile is now left
