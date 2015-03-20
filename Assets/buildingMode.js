@@ -29,20 +29,11 @@ public var blankBlockName : String;
 public var sourceBlockName : String;
 
 function saveBuiling(){
-	var test = new List.<int>();
-	for(var k : int = 0; k < 5; k++){
-		test.Add(k);
-		Debug.Log(k + ' ' + test[k]);
-	}
-	for(var l : int = 0; l < test.Count; l++){
-		Debug.Log(l + ' ' + test[l]);
-	}
 	//format Data
 	var taggedBuildingBlocks: GameObject[];
 	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
-	var buildingBlock = new blockData();
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
-		buildingBlocks.Add(buildingBlock);
+		buildingBlocks.Add(new blockData());
 		//type
 		if(taggedBuildingBlocks[i].name == sourceBlockName ){
 			buildingBlocks[i].type=0;
@@ -51,15 +42,11 @@ function saveBuiling(){
 			buildingBlocks[i].type=1;
 		}
 		//positon x
-		buildingBlocks[i].x=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x/blockHeight);
+		buildingBlocks[i].x=Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x/blockHeight);
 		//positon y
-		buildingBlocks[i].y=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y/blockHeight);
+		buildingBlocks[i].y=Mathf.RoundToInt((taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y-blockHeight/2)/blockHeight);
 		//positon z
-		buildingBlocks[i].z=Mathf.FloorToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z/blockHeight);
-		Debug.Log(i + ' ' + buildingBlocks[i].x);
-	}
-	for(var j : int = 0; j < buildingBlocks.Count; j++){
-		Debug.Log(j + ' ' + buildingBlocks[j].x);
+		buildingBlocks[i].z=Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z/blockHeight);
 	}
 	//save data
 	var bf : BinaryFormatter = new BinaryFormatter();
@@ -84,6 +71,11 @@ function loadBuiling(){
 }
 
 function buildFromData(){
+	var taggedBuildingBlocks: GameObject[];
+	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	for(var j : int = 0; j < taggedBuildingBlocks.length; j++){
+		removeBuildingBlock(taggedBuildingBlocks[j]);
+	}
 	var blockInstance: GameObject;
 	var buildingBlock = new blockData();
 	for(var i : int = 0; i < buildingBlocks.Count; i++){
@@ -92,11 +84,10 @@ function buildFromData(){
 		var blockPosition : Vector3;
 		//positon x
 		intValue = buildingBlock.x;
-		Debug.Log(buildingBlock.x);
 		blockPosition.x=intValue*blockHeight;
 		//positon y
 		intValue = buildingBlock.y;
-		blockPosition.y=intValue*blockHeight;
+		blockPosition.y=intValue*blockHeight+blockHeight/2;
 		//positon z
 		intValue = buildingBlock.z;
 		blockPosition.z=intValue*blockHeight;
@@ -111,6 +102,7 @@ function buildFromData(){
 				blockInstance.transform.SetParent(player.transform,false);
 				break;
 		}
+		createJoints(blockInstance);
 	}
 }
 
@@ -122,11 +114,11 @@ function enterBuildingMode(){
 	for(var i : int = 0; i < buildingBlocks.length; i++){
 		buildingBlocks[i].GetComponent.<Rigidbody>().useGravity = false;
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = true;
+		removeJoints(buildingBlocks[i]);
 	}
 }
 
 function exitBuildingMode(){
-	Debug.Log("exit buildingMode");
 	buildingMode=false;
 	removePlaceholders();
 	var buildingBlocks: GameObject[];
@@ -134,7 +126,12 @@ function exitBuildingMode(){
 	for(var i : int = 0; i < buildingBlocks.length; i++){
 		buildingBlocks[i].GetComponent.<Rigidbody>().useGravity = true;
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = false;
+		createJoints(buildingBlocks[i]);
 	}
+}
+
+function removeBuildingBlock(blockInstance: GameObject){
+	Destroy (blockInstance);
 }
 
 function removePlaceholders(){
@@ -154,6 +151,51 @@ function Start(){
 	blockInstance = Instantiate(sourceBlock,initPosition, player.transform.rotation)as GameObject;
 	blockInstance.transform.SetParent(player.transform,false);
 }
+function removeJoints(blockInstance: GameObject){
+	var buildingBlocks: GameObject[];
+	buildingBlocks = GameObject.FindGameObjectsWithTag ("buildingBlock");
+	var joints: Component[];
+	joints = blockInstance.GetComponents.<FixedJoint>() as Component[];
+	for(var k=0;k<joints.length;k++) {
+	    Destroy(joints[k] as FixedJoint);
+	}
+	for(var j=0;j<buildingBlocks.length;j++) {
+		joints = buildingBlocks[j].GetComponents.<FixedJoint>() as Component[];
+		for(var i : int = 0; i < joints.length; i++){
+			joint=joints[i];
+			if(joint.connectedBody == blockInstance.GetComponent.<Rigidbody>()){
+	        	Destroy(joints[i] as FixedJoint);
+	        }	
+		}
+	}
+}
+function createJoints(blockInstance: GameObject){
+	var newBlockPosition:Vector3=blockInstance.GetComponent.<Rigidbody>().position;
+	var buildingBlocks: GameObject[];
+	buildingBlocks = GameObject.FindGameObjectsWithTag ("buildingBlock");
+	for(var i=0;i<buildingBlocks.length;i++) {
+		var blockPosition:Vector3=buildingBlocks[i].GetComponent.<Rigidbody>().position;
+		//if next to
+		var match1:Vector3=(newBlockPosition);
+		match1.x=match1.x+blockHeight;
+		var match2:Vector3=(newBlockPosition);
+		match2.x=match2.x-blockHeight;
+		var match3:Vector3=(newBlockPosition);
+		match3.y=match3.y+blockHeight;
+		var match4:Vector3=(newBlockPosition);
+		match4.y=match4.y-blockHeight;
+		var match5:Vector3=(newBlockPosition);
+		match5.z=match5.z+blockHeight;
+		var match6:Vector3=(newBlockPosition);
+		match6.z=match6.z-blockHeight;
+		if(blockPosition==match1||blockPosition==match2||blockPosition==match3||blockPosition==match4||blockPosition==match5||blockPosition==match6){
+			joint = blockInstance.AddComponent.<FixedJoint>();
+			joint.connectedBody = buildingBlocks[i].GetComponent.<Rigidbody>();
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
+		}
+	}
+}
 function Update (){	
 	if(buildingMode){
 		removePlaceholders();
@@ -170,31 +212,6 @@ function Update (){
 				{
 					blockInstance = Instantiate(newBlock,position,hit.collider.gameObject.GetComponent.<Rigidbody>().rotation)as GameObject;
 					blockInstance.transform.SetParent(player.transform,false);
-			 		var buildingBlocks: GameObject[];
-					buildingBlocks = GameObject.FindGameObjectsWithTag ("buildingBlock");
-					for(var i=0;i<buildingBlocks.length;i++) {
-						//if next to
-						var blockPosition:Vector3=buildingBlocks[i].GetComponent.<Rigidbody>().position;
-						var match1:Vector3=(position);
-						match1.x=match1.x+blockHeight;
-						var match2:Vector3=(position);
-						match2.x=match2.x-blockHeight;
-						var match3:Vector3=(position);
-						match3.y=match3.y+blockHeight;
-						var match4:Vector3=(position);
-						match4.y=match4.y-blockHeight;
-						var match5:Vector3=(position);
-						match5.z=match5.z+blockHeight;
-						var match6:Vector3=(position);
-						match6.z=match6.z-blockHeight;
-						if(blockPosition==match1||blockPosition==match2||blockPosition==match3||blockPosition==match4||blockPosition==match5||blockPosition==match6){
-							joint = blockInstance.AddComponent.<FixedJoint>();
-							var body= blockInstance.GetComponent.<Rigidbody>();
-				 			joint.connectedBody = buildingBlocks[i].GetComponent.<Rigidbody>();
-				 			joint.breakForce = breakForce;
-				 			joint.breakTorque = breakTorque;
-						}
-					}
 				}
 				else
 				{
