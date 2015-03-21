@@ -46,13 +46,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\NewBehaviourScript.js" />
-     <Compile Include="Assets\buildingMode.js" />
-     <Compile Include="Assets\cameraMovement.js" />
-     <Compile Include="Assets\hexaWorldGenerator.js" />
-     <Compile Include="Assets\playerProperties.js" />
-     <Compile Include="Assets\test list.js" />
-     <Compile Include="Assets\thrust.js" />
+     <Compile Include="Assets\Scripts\buildingMode.js" />
+     <Compile Include="Assets\Scripts\cameraMovement.js" />
+     <Compile Include="Assets\Scripts\hexaWorldGenerator.js" />
+     <Compile Include="Assets\Scripts\playerProperties.js" />
+     <Compile Include="Assets\Scripts\screenSize.js" />
+     <Compile Include="Assets\Scripts\thrust.js" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
