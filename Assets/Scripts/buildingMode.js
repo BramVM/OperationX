@@ -255,7 +255,7 @@ function createJoints(blockInstance: GameObject){
 	var front: Vector3=blockInstance.transform.forward;
 	var back: Vector3=blockInstance.transform.forward*-1;
 	if (Physics.Raycast(newBlockPosition,up,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePY){
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -275,7 +275,7 @@ function createJoints(blockInstance: GameObject){
 		Debug.Log(hit.normal);
 		Debug.Log(hit.distance);
 		Debug.Log(hit.collider.name);
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -292,7 +292,7 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,right,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePX){
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -309,7 +309,7 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,left,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNX){
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -326,7 +326,7 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,front,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePZ){
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -343,7 +343,7 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,back,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNZ){
-		if(hit.distance<blockHeight-0.1){
+		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
@@ -434,7 +434,7 @@ function Update (){
 					if(Input.GetMouseButtonDown(0)){
 						Destroy(hitObject);
 						Debug.Log("destroy " + hitObject);
-						saveBuilding(null);
+						saveBuilding(hitObject);
 					}
 					else{
 						//temporary change material
