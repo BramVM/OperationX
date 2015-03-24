@@ -57,7 +57,7 @@ function removePlaceholders(){
 	placeholders = player.FindGameObjectsWithTag ("placeholder");
 	for(var i : int = 0; i < placeholders.length; i++)
 	{
-		Destroy (placeholders[i]);
+		DestroyImmediate (placeholders[i]);
 	}
 }
 
@@ -72,75 +72,73 @@ function toggleRemovalMode(){
 	removePlaceholders();
 }
 
-function saveBuilding(ignoreThisObject:GameObject){
+function saveBuilding(){
 	//format Data
 	var taggedBuildingBlocks= new GameObject[0];
 	//taggedBuildingBlocks.Clear();
 	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
 	buildingBlocks.Clear();
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
-		if(ignoreThisObject==null||taggedBuildingBlocks[i]!=ignoreThisObject){
-			buildingBlocks.Add(new blockData());
-			//orientation & position
-			var yPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y-blockHeight/2;
-			var xPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x;
-			var zPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z;
-			var blockHeightModifier = taggedBuildingBlocks[i].GetComponent.<blockPropperties>().proportionalHeight;
-			var xRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.x);
-			var yRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.y);
-			var zRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.z);
-		    if (xRotation==0){
-		    	buildingBlocks[i].orientation=0;
-		    	yPosition = yPosition+((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-		    if (yRotation==180 && zRotation==180){
-		        buildingBlocks[i].orientation=1;
-		        yPosition = yPosition-((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-		    if (xRotation==90){
-		        buildingBlocks[i].orientation=2;
-		        xPosition = xPosition+((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-		    if (xRotation==270){
-		        buildingBlocks[i].orientation=3;
-		        xPosition = xPosition-((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-		    if (zRotation==90){
-		    	buildingBlocks[i].orientation=4;
-		    	zPosition = zPosition+((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-		    if (zRotation==270){
-		        buildingBlocks[i].orientation=5;
-		        zPosition = zPosition+((1-blockHeightModifier)/2*blockHeight);
-		        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
-		        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
-		        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
-		    }
-			//type
-			if(taggedBuildingBlocks[i].name == sourceBlockName ){
-				buildingBlocks[i].type=0;
-			}
-			if(taggedBuildingBlocks[i].name == blankBlockName ){
-				buildingBlocks[i].type=1;
-			}
-			if(taggedBuildingBlocks[i].name == thrustBlockName ){
-				buildingBlocks[i].type=2;
-			}
+		buildingBlocks.Add(new blockData());
+		//orientation & position
+		var yPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y+blockHeight/2;
+		var xPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x;
+		var zPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z;
+		var blockHeightModifier = taggedBuildingBlocks[i].GetComponent.<blockPropperties>().proportionalHeight;
+		var xRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.x);
+		var yRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.y);
+		var zRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.z);
+	    if (xRotation==0){
+	    	buildingBlocks[i].orientation=0;
+	    	yPosition = yPosition+((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+	    if (yRotation==180 && zRotation==180){
+	        buildingBlocks[i].orientation=1;
+	        yPosition = yPosition-((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+	    if (xRotation==90){
+	        buildingBlocks[i].orientation=2;
+	        xPosition = xPosition+((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+	    if (xRotation==270){
+	        buildingBlocks[i].orientation=3;
+	        xPosition = xPosition-((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+	    if (zRotation==90){
+	    	buildingBlocks[i].orientation=4;
+	    	zPosition = zPosition+((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+	    if (zRotation==270){
+	        buildingBlocks[i].orientation=5;
+	        zPosition = zPosition+((1-blockHeightModifier)/2*blockHeight);
+	        buildingBlocks[i].x=Mathf.RoundToInt(xPosition/blockHeight);
+	        buildingBlocks[i].y=Mathf.RoundToInt(yPosition/blockHeight);
+	        buildingBlocks[i].z=Mathf.RoundToInt(zPosition/blockHeight);
+	    }
+		//type
+		if(taggedBuildingBlocks[i].name == sourceBlockName ){
+			buildingBlocks[i].type=0;
+		}
+		if(taggedBuildingBlocks[i].name == blankBlockName ){
+			buildingBlocks[i].type=1;
+		}
+		if(taggedBuildingBlocks[i].name == thrustBlockName ){
+			buildingBlocks[i].type=2;
 		}
 	}
 	//save data
@@ -170,7 +168,7 @@ function buildFromData(){
 	var taggedBuildingBlocks: GameObject[];
 	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
 	for(var j : int = 0; j < taggedBuildingBlocks.length; j++){
-		Destroy (taggedBuildingBlocks[j]);
+		DestroyImmediate (taggedBuildingBlocks[j]);
 	}
 	var blockInstance: GameObject;
 	var buildingBlock = new blockData();
@@ -193,43 +191,43 @@ function buildFromData(){
 		var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
 	    switch (buildingBlocks[i].orientation){
 		    case 0:
-		    	rotation.eulerAngles.y=rotation.eulerAngles.y;
 		    	blockPosition.x=buildingBlock.x*blockHeight;
 		    	blockPosition.z=buildingBlock.z*blockHeight;
-		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2+(1-blockHeightModifier)/2*blockHeight;
+		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2-(1-blockHeightModifier)/2*blockHeight;
 		    	break;
 		    case 1:
 		        rotation.eulerAngles.y=rotation.eulerAngles.y+180;
 		        rotation.eulerAngles.z=rotation.eulerAngles.z+180;
 		        blockPosition.x=buildingBlock.x*blockHeight;
 		    	blockPosition.z=buildingBlock.z*blockHeight;
-		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2-(1-blockHeightModifier)/2*blockHeight;
+		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2+(1-blockHeightModifier)/2*blockHeight;
 		    	break;
 		    case 2:
-		    	rotation.eulerAngles.x=rotation.eulerAngles.x+90;
+		    	rotation.eulerAngles.x=rotation.eulerAngles.x+270;
 		        blockPosition.z=buildingBlock.z*blockHeight+(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.x=buildingBlock.x*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		    	break;
 		    case 3:
-		        rotation.eulerAngles.x=rotation.eulerAngles.x+270;
+		        rotation.eulerAngles.x=rotation.eulerAngles.x+90;
 		        blockPosition.z=buildingBlock.z*blockHeight-(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.x=buildingBlock.x*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		    	break;
 		    case 4:
-		    	rotation.eulerAngles.z=rotation.eulerAngles.z+90;
+		    	rotation.eulerAngles.z=rotation.eulerAngles.z+270;
 		    	blockPosition.z=buildingBlock.z*blockHeight;
 		    	blockPosition.x=buildingBlock.x*blockHeight-(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		    	break;
 		    case 5:
-		        rotation.eulerAngles.z=rotation.eulerAngles.z+270;
+		        rotation.eulerAngles.z=rotation.eulerAngles.z+90;
 		        blockPosition.z=buildingBlock.z*blockHeight;
 		    	blockPosition.x=buildingBlock.x*blockHeight+(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		        break;
 	    }
+	    Debug.Log(rotation.eulerAngles);
 	    blockInstance = Instantiate(holding,blockPosition,rotation)as GameObject;
 		blockInstance.transform.SetParent(player.transform,false);
 		if(blockInstance.name==sourceBlockName){
@@ -248,21 +246,22 @@ function createJoints(blockInstance: GameObject){
 	var hitAttachablePZ : boolean;
 	var hitAttachableNZ : boolean;
 	var hit : RaycastHit;
-	var down: Vector3=blockInstance.transform.up;
-	var up: Vector3=blockInstance.transform.up*-1;
+	var up: Vector3=blockInstance.transform.up;
+	var down: Vector3=blockInstance.transform.up*-1;
 	var right: Vector3=blockInstance.transform.right;
 	var left: Vector3=blockInstance.transform.right*-1;
 	var front: Vector3=blockInstance.transform.forward;
 	var back: Vector3=blockInstance.transform.forward*-1;
 	if (Physics.Raycast(newBlockPosition,up,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePY){
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
+				Debug.Log("joint");
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -272,17 +271,14 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,down,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNY){
-		Debug.Log(hit.normal);
-		Debug.Log(hit.distance);
-		Debug.Log(hit.collider.name);
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -292,14 +288,17 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,right,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePX){
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
+				Debug.Log(hit.normal);
+				Debug.Log(hit.distance);
+				Debug.Log(hit.collider.name);
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -309,14 +308,14 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,left,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNX){
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -326,14 +325,14 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,front,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePZ){
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -343,14 +342,14 @@ function createJoints(blockInstance: GameObject){
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,back,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNZ){
-		if(hit.distance<blockHeight-0.1&&hit.collider.tag=="buildingBlock"){
+		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
 			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
 			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
 			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
 			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((hit.normal.y==-1&&hitAttachableNY)||(hit.normal.y==1&&hitAttachablePY)||(hit.normal.x==-1&&hitAttachableNX)||(hit.normal.x==1&&hitAttachablePX)||(hit.normal.z==-1&&hitAttachableNZ)||(hit.normal.z==1&&hitAttachablePZ)){
+			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
@@ -367,14 +366,14 @@ function removeJoints(blockInstance: GameObject){
 	var joints: Component[];
 	joints = blockInstance.GetComponents.<FixedJoint>() as Component[];
 	for(var k=0;k<joints.length;k++) {
-	    Destroy(joints[k] as FixedJoint);
+	    DestroyImmediate(joints[k] as FixedJoint);
 	}
 	for(var j=0;j<buildingBlocks.length;j++) {
 		joints = buildingBlocks[j].GetComponents.<FixedJoint>() as Component[];
 		for(var i : int = 0; i < joints.length; i++){
 			joint=joints[i];
 			if(joint.connectedBody == blockInstance.GetComponent.<Rigidbody>()){
-	        	Destroy(joints[i] as FixedJoint);
+	        	DestroyImmediate(joints[i] as FixedJoint);
 	        }	
 		}
 	}
@@ -395,14 +394,15 @@ function exitBuildingMode(){
 	buildingMode=false;
 	removePlaceholders();
 	loadBuiling();
-	var buildingBlocks: GameObject[];
+	var buildingBlocks= new GameObject[0];
 	buildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	Debug.Log("detected "+ buildingBlocks.length);
 	for(var i : int = 0; i < buildingBlocks.length; i++){
 		buildingBlocks[i].GetComponent.<Rigidbody>().useGravity = true;
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = false;
 		createJoints(buildingBlocks[i]);
 	}
-	Debug.Log(nrjoint);
+	//Debug.Log(nrjoint);
 }
 
 function Awake(){
@@ -432,9 +432,8 @@ function Update (){
 				var hitObject:GameObject=hit.collider.gameObject;
 				if(hitObject.tag=="buildingBlock"&&hit.collider.name!=sourceBlockName){
 					if(Input.GetMouseButtonDown(0)){
-						Destroy(hitObject);
-						Debug.Log("destroy " + hitObject);
-						saveBuilding(hitObject);
+						DestroyImmediate(hitObject);
+						saveBuilding();
 					}
 					else{
 						//temporary change material
@@ -464,7 +463,7 @@ function Update (){
 					//Debug.Log(hit.normal);
 					rotation.eulerAngles.x = rotation.eulerAngles.x-(90*hit.normal.z);
 					rotation.eulerAngles.z = rotation.eulerAngles.z+(90*hit.normal.x);
-					if(Math.Round(hit.normal.y)>0){
+					if(Math.Round(hit.normal.y)<0){
 						rotation.eulerAngles.x = rotation.eulerAngles.x+(180*hit.normal.y);
 					}
 					//Debug.Log(rotation.eulerAngles);
@@ -474,12 +473,12 @@ function Update (){
 					blockInstance.transform.SetParent(player.transform,false);
 					if(Input.GetMouseButtonDown(0))
 					{
-						saveBuilding(null);
+						saveBuilding();
 					}
 					else
 					{
 						//change it into a placeholder
-						Destroy(blockInstance.transform.GetComponent.<BoxCollider>());
+						DestroyImmediate(blockInstance.transform.GetComponent.<BoxCollider>());
 						if(blockInstance.transform.Find('Cube')!=null){
 							blockInstance.transform.Find('Cube').transform.GetComponent.<Renderer>().material=placeholderMaterial;
 						}
