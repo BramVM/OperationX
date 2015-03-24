@@ -23,8 +23,7 @@ private var grid_z : float;
  
 function Start () {
     grid_z = Mathf.Sqrt((Mathf.Pow((grid_x*2), 2)-Mathf.Pow((grid_x), 2)));
-	tileScale = grid_x * 1.15470041009; //<--THIS NUMBER NEEDS TRUE VALUE
-	Debug.Log(grid_z);
+	tileScale = grid_x * 1.90; //<--THIS NUMBER NEEDS TRUE VALUE
 	/*get player position*/
 	var playerPos_x = player.transform.position.x;
 	var playerPos_z = player.transform.position.z;
@@ -103,14 +102,10 @@ function Start () {
 	bottomLeftTileInstance.name = "tileBotLeft";
 };
 
-InvokeRepeating("checkPlayerPosition", 1, 4);
+InvokeRepeating("checkPlayerPosition", 1, 1);
 
-function checkPlayerPosition(){
-	var playerPos_x = player.transform.position.x;
-	var playerPos_y = player.transform.position.y;
-	var playerPos_z = player.transform.position.z;
-	var playerPos = Vector3(playerPos_x,playerPos_y,playerPos_z);
-	
+function FixedUpdate(){
+	var playerPos:Vector3 = player.transform.position;
 	var direction = transform.TransformDirection (Vector3.down);
 	var hit : RaycastHit;
 	
@@ -122,38 +117,74 @@ function checkPlayerPosition(){
 		   	Destroy(GameObject.Find("tileLeft"));
 		   	Destroy(GameObject.Find("tileTopLeft"));
 		   	Destroy(GameObject.Find("tileBotLeft"));
-	    	midTileInstance.name = "tileLeft";
-	    	topRightTileInstance.name = "tileTopLeft";
-	    	bottomRightTileInstance.name = "tileBotLeft";
-	        rightTileInstance.name = "tileMid";
-	        
+	    	GameObject.Find("tileMid").name = "tileLeft";
+	    	GameObject.Find("tileTopRight").name = "tileTopLeft";
+	    	GameObject.Find("tileBotRight").name = "tileBotLeft";
+	        GameObject.Find("tileRight").name = "tileMid";
 	        instantiateTileRight();
+	        instantiateTileBotRight();
+	        instantiateTileTopRight();
 	        break;
 	    case "tileLeft":
 	    	Destroy(GameObject.Find("tileRight"));
 		   	Destroy(GameObject.Find("tileTopRight"));
 		   	Destroy(GameObject.Find("tileBotRight"));
-	        midTileInstance.name = "tileRight";
-	        topLeftTileInstance.name = "tileTopRight";
-	    	bottomLeftTileInstance.name = "tileBotRight";
-	    	leftTileInstance.name = "tileMid";
-	  
+	        GameObject.Find("tileMid").name = "tileRight";
+	        GameObject.Find("tileTopLeft").name = "tileTopRight";
+	    	GameObject.Find("tileBotLeft").name = "tileBotRight";
+	    	GameObject.Find("tileLeft").name = "tileMid";
 	        instantiateTileLeft();
+	        instantiateTileBotLeft();
+	        instantiateTileTopLeft();
 	        break;
 	    case "tileTopRight":
-	        print ("tileTopRight");
+	        Destroy(GameObject.Find("tileLeft"));
+		   	Destroy(GameObject.Find("tileBotLeft"));
+		   	Destroy(GameObject.Find("tileBotRight"));
+	        GameObject.Find("tileMid").name = "tileBotLeft";
+	        GameObject.Find("tileTopLeft").name = "tileLeft";
+	    	GameObject.Find("tileRight").name = "tileBotRight";
+	    	GameObject.Find("tileTopRight").name = "tileMid";
+	        instantiateTileRight();
+	        instantiateTileTopRight();
+	        instantiateTileTopLeft();
 	        break;
-	    case "tileTopRight":
-	        print ("tileLeft");
+	    case "tileTopLeft":
+	        Destroy(GameObject.Find("tileRight"));
+		   	Destroy(GameObject.Find("tileBotLeft"));
+		   	Destroy(GameObject.Find("tileBotRight"));
+	        GameObject.Find("tileMid").name = "tileBotRight";
+	        GameObject.Find("tileTopLeft").name = "tileMid";
+	    	GameObject.Find("tileLeft").name = "tileBotLeft";
+	    	GameObject.Find("tileTopRight").name = "tileRight";
+	        instantiateTileLeft();
+	        instantiateTileTopRight();
+	        instantiateTileTopLeft();
 	        break;
 	    case "tileBotRight":
-	        print ("tileBotRight");
+	        Destroy(GameObject.Find("tileLeft"));
+		   	Destroy(GameObject.Find("tileTopLeft"));
+		   	Destroy(GameObject.Find("tileTopRight"));
+	        GameObject.Find("tileMid").name = "tileTopLeft";
+	        GameObject.Find("tileRight").name = "tileTopRight";
+	    	GameObject.Find("tileBotLeft").name = "tileLeft";
+	    	GameObject.Find("tileBotRight").name = "tileMid";
+	        instantiateTileRight();
+	        instantiateTileBotLeft();
+	        instantiateTileBotRight();
 	        break;
 	    case "tileBotLeft":
-	        print ("tileBotLeft");
-	        break;
+	        Destroy(GameObject.Find("tileRight"));
+		   	Destroy(GameObject.Find("tileTopLeft"));
+		   	Destroy(GameObject.Find("tileTopRight"));
+	        GameObject.Find("tileMid").name = "tileTopRight";
+	        GameObject.Find("tileLeft").name = "tileTopLeft";
+	    	GameObject.Find("tileBotRight").name = "tileRight";
+	    	GameObject.Find("tileBotLeft").name = "tileMid";
+	        instantiateTileLeft();
+	        instantiateTileBotLeft();
+	        instantiateTileBotRight();
 	    default:
-	        print ("Default");
 	        break;
 	    }
 
@@ -162,31 +193,53 @@ function checkPlayerPosition(){
 
 function instantiateTileRight(){
 	var curMid = GameObject.Find("tileMid");
-	var curMid_x = curMid.transform.position.x;
-	var curMid_z = curMid.transform.position.z;
-	Debug.Log(curMid_x);
-	var rightTilePosition = Vector3(curMid_x+curMid_x*grid_x,0,curMid_z);
-	rightTileInstance = Instantiate(tile,rightTilePosition,tile.transform.rotation )as GameObject;
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x+2*grid_x;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
 	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 	rightTileInstance.name = "tileRight";
-	Debug.Log(curMid_z);
-	
-	var topRightTilePosition = Vector3(curMid_x + grid_x, 0, curMid_z + grid_z);
-	topRightTileInstance = Instantiate(tile,topRightTilePosition,tile.transform.rotation )as GameObject;
-	topRightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
-	topRightTileInstance.name = "tileTopRight";
-	
-	var bottomRightTilePosition = Vector3(curMid_x + grid_x, 0, curMid_z - grid_z);
-	bottomRightTileInstance = Instantiate(tile,bottomRightTilePosition,tile.transform.rotation )as GameObject;
-	bottomRightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
-	bottomRightTileInstance.name = "tileBotRight";
 };
-
+function instantiateTileTopRight(){
+	var curMid = GameObject.Find("tileMid");
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x+grid_x;
+	tilePosition.z = tilePosition.z+grid_z;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+	rightTileInstance.name = "tileTopRight";
+};
+function instantiateTileTopLeft(){
+	var curMid = GameObject.Find("tileMid");
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x-grid_x;
+	tilePosition.z = tilePosition.z+grid_z;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+	rightTileInstance.name = "tileTopLeft";
+};
 function instantiateTileLeft(){
 	var curMid = GameObject.Find("tileMid");
-	var curMid_x = curMid.transform.position.x;
-	var leftTilePosition = Vector3(curMid_x-2*grid_x,0,curMid.transform.position.z);
-	leftTileInstance = Instantiate(tile,leftTilePosition,tile.transform.rotation )as GameObject;
-	leftTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
-	leftTileInstance.name = "tileLeft";
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x-2*grid_x;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+	rightTileInstance.name = "tileLeft";
+};
+function instantiateTileBotRight(){
+	var curMid = GameObject.Find("tileMid");
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x+grid_x;
+	tilePosition.z = tilePosition.z-grid_z;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+	rightTileInstance.name = "tileBotRight";
+};
+function instantiateTileBotLeft(){
+	var curMid = GameObject.Find("tileMid");
+	var tilePosition = curMid.transform.position;
+	tilePosition.x = tilePosition.x-grid_x;
+	tilePosition.z = tilePosition.z-grid_z;
+	rightTileInstance = Instantiate(tile,tilePosition,tile.transform.rotation )as GameObject;
+	rightTileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+	rightTileInstance.name = "tileBotLeft";
 };

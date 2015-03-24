@@ -227,11 +227,11 @@ function buildFromData(){
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		        break;
 	    }
-	    Debug.Log(rotation.eulerAngles);
 	    blockInstance = Instantiate(holding,blockPosition,rotation)as GameObject;
 		blockInstance.transform.SetParent(player.transform,false);
 		if(blockInstance.name==sourceBlockName){
 			cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
+			GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
 	    }
 	    holding=null;
 	}
@@ -261,12 +261,10 @@ function createJoints(blockInstance: GameObject){
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
 			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				Debug.Log("joint");
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -283,7 +281,6 @@ function createJoints(blockInstance: GameObject){
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -296,14 +293,10 @@ function createJoints(blockInstance: GameObject){
 			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
 			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				Debug.Log(hit.normal);
-				Debug.Log(hit.distance);
-				Debug.Log(hit.collider.name);
 				joint = blockInstance.AddComponent.<FixedJoint>();
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -320,7 +313,6 @@ function createJoints(blockInstance: GameObject){
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -337,7 +329,6 @@ function createJoints(blockInstance: GameObject){
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -354,7 +345,6 @@ function createJoints(blockInstance: GameObject){
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
-				nrjoint++;
 			}
 		}
 	}
@@ -388,21 +378,19 @@ function enterBuildingMode(){
 		removeJoints(buildingBlocks[i]);
 	}
 }
-var nrjoint:int=0;
+
 function exitBuildingMode(){
-	nrjoint=0;
+
 	buildingMode=false;
 	removePlaceholders();
 	loadBuiling();
 	var buildingBlocks= new GameObject[0];
 	buildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
-	Debug.Log("detected "+ buildingBlocks.length);
 	for(var i : int = 0; i < buildingBlocks.length; i++){
 		buildingBlocks[i].GetComponent.<Rigidbody>().useGravity = true;
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = false;
 		createJoints(buildingBlocks[i]);
 	}
-	//Debug.Log(nrjoint);
 }
 
 function Awake(){
@@ -416,6 +404,7 @@ function Awake(){
 	blockInstance = Instantiate(sourceBlock,initPosition, initRotation)as GameObject;
 	blockInstance.transform.SetParent(player.transform,false);
 	cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
+	GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
 }
 
 function Start(){
@@ -460,13 +449,11 @@ function Update (){
 					//calc rotation
 					//var rotation : Quaternion = hit.collider.gameObject.GetComponent.<Rigidbody>().rotation;
 					var rotation : Quaternion;
-					//Debug.Log(hit.normal);
 					rotation.eulerAngles.x = rotation.eulerAngles.x-(90*hit.normal.z);
 					rotation.eulerAngles.z = rotation.eulerAngles.z+(90*hit.normal.x);
 					if(Math.Round(hit.normal.y)<0){
 						rotation.eulerAngles.x = rotation.eulerAngles.x+(180*hit.normal.y);
 					}
-					//Debug.Log(rotation.eulerAngles);
 					//create Block
 					var blockInstance : GameObject;
 					blockInstance = Instantiate(holding,position,rotation)as GameObject;
