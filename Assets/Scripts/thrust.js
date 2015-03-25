@@ -5,6 +5,7 @@ var max=1;
 
 function Start() {
 	rb = GetComponent.<Rigidbody>();
+	/*GetComponent.<thrust_animation>().Play();*/
 }
 
 function FixedUpdate () {
@@ -17,3 +18,4 @@ function FixedUpdate () {
 function Update () {
 
 }
+
