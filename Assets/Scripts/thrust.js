@@ -10,7 +10,7 @@ function Start() {
 function FixedUpdate () {
 	if (Input.GetKey ("return")){
 		rb.AddForce(-transform.up * thrust);
-		Debug.Log(thrust);
+		//Debug.Log(thrust);
 	}
 }
 

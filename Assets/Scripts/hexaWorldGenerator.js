@@ -44,6 +44,7 @@ function initTiles(){
 			midTilePosition.z=gridNumber_z2*grid_z;
 		}
 	}
+	midTilePosition.y=midTilePosition.y-20;
 	//topRightQuarter
 	var newPos = midTilePosition;
 	var zRowCount:int=0;
@@ -132,15 +133,30 @@ function generateWorld(){
 	var playerPos_x = player.transform.position.x;
 	var playerPos_z = player.transform.position.z;
 	/*get amount of gridlines between player position and origin*/
-	var gridNumber_x1: int = Mathf.FloorToInt(playerPos_x / grid_x);
-	var gridNumber_z1: int = Mathf.FloorToInt(playerPos_z / grid_z);
-	/*get gridline number of the line after the player startng from origin*/
-	var gridNumber_x2: int = Mathf.CeilToInt(playerPos_x / grid_x) ;
-	var gridNumber_z2: int = Mathf.CeilToInt(playerPos_z / grid_z) ;
+	var gridNumber_x1:int;
+	var gridNumber_x2:int;
+	var gridNumber_z1:int;
+	var gridNumber_z2:int;
+	if(playerPos_x>0){
+		gridNumber_x1 = Mathf.FloorToInt(playerPos_x / grid_x);
+		gridNumber_x2 = Mathf.CeilToInt(playerPos_x / grid_x);
+	}
+	else{
+		gridNumber_x1 = Mathf.CeilToInt(playerPos_x / grid_x);
+		gridNumber_x2 = Mathf.FloorToInt(playerPos_x / grid_x);
+	}
+	if(playerPos_z>0){
+		gridNumber_z1 = Mathf.FloorToInt(playerPos_z / grid_z);
+		gridNumber_z2 = Mathf.CeilToInt(playerPos_z / grid_z);
+	}
+	else{
+		gridNumber_z1 = Mathf.CeilToInt(playerPos_z / grid_z);
+		gridNumber_z2 = Mathf.FloorToInt(playerPos_z / grid_z);
+	}
 	//check wich z-grid line is closest
 	if(Mathf.Pow(gridNumber_z2*grid_z,2)-Mathf.Pow(playerPos_z,2) >= Mathf.Pow(playerPos_z,2)-Mathf.Pow(gridNumber_z1*grid_z,2)){
 		//closer to z1
-		if(gridNumber_x1%2==0&&gridNumber_x1%2==0){
+		if(gridNumber_x1%2==0&&gridNumber_z1%2==0){
 			midTilePosition.x=gridNumber_x1*grid_x;
 			midTilePosition.z=gridNumber_z1*grid_z;
 		}
@@ -151,7 +167,7 @@ function generateWorld(){
 	}
 	else{
 		//closer to z2
-		if(gridNumber_x1%2==0&&gridNumber_x1%2==0){
+		if(gridNumber_x1%2==0&&gridNumber_z1%2==0){
 			midTilePosition.x=gridNumber_x2*grid_x;
 			midTilePosition.z=gridNumber_z2*grid_z;
 		}
@@ -160,18 +176,29 @@ function generateWorld(){
 			midTilePosition.z=gridNumber_z2*grid_z;
 		}
 	}
+	
 	if(prevMidTilePosition != midTilePosition){
-		Debug.Log('mooved a tile');
+		
+		//Debug.Log(grid_z);
+		//Debug.Log(midTilePosition);
+		//Debug.Log('moved a tile');
 		//moveTiles
-		var translation = prevMidTilePosition-midTilePosition;
+		var translation:Vector3;
+		Debug.Log(midTilePosition);
+		translation.x = midTilePosition.x-prevMidTilePosition.x;
+		translation.z = midTilePosition.z-prevMidTilePosition.z;
+		Debug.Log(translation.x);
+		Debug.Log(translation.z);
 		var tiles= new GameObject[0];
 		var seedRef:float;
 		//taggedBuildingBlocks.Clear();
 		tiles = GameObject.FindGameObjectsWithTag ("tile");
 		for(var i : int = 0; i < tiles.length; i++){
-			tiles[i].transform.position = tiles[i].transform.position-translation;
+			tiles[i].transform.position.x = tiles[i].transform.position.x+translation.x;
+			tiles[i].transform.position.z = tiles[i].transform.position.z+translation.z;
 			seedRef = tiles[i].transform.position.x+tiles[i].transform.position.z;
-			tiles[i].transform.position.y = seed(seedRef);
+			//Debug.Log(seedRef);
+			tiles[i].transform.position.y = seed(seedRef)-20;
 		}
 		
 	}
