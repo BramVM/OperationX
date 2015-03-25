@@ -411,7 +411,7 @@ function Start(){
 	loadBuiling();
 }
 
-function Update (){	
+function builder (){	
 	if(buildingMode){
 		var ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		var hit : RaycastHit;
