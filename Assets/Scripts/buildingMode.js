@@ -239,10 +239,11 @@ function buildFromData(){
 	    if(i==0){	    	pointOfMass=blockInstance.transform.position;
 		}
 		else{
-	    	pointOfMass=(pointOfMass+blockInstance.transform.position)/2;
+	    	pointOfMass=pointOfMass+blockInstance.transform.position;
 	    }
 	    holding=null;
 	}
+	pointOfMass=pointOfMass/buildingBlocks.Count;
 	pointOfMassIndicator.transform.position=pointOfMass;
 }
 
