@@ -20,6 +20,7 @@ public var breakTorque : float;
 public var buildingMode : boolean = true;
 public var deleteMaterial: Material;
 public var placeholderMaterial: Material;
+public var pointOfMassIndicator:GameObject;
 
 private var joint: FixedJoint;
 private	var buildingBlocks = new List.<blockData>();
@@ -28,6 +29,8 @@ private var cam : GameObject;
 private var holding : GameObject;
 private var objectWithTempDeleteMaterial: Renderer;
 private var originalMaterialBeforeChangedToDelete: Material;
+private var sourceBlockInstance:GameObject;
+private var pointOfMass:Vector3;
 
 public var sourceBlock : GameObject;
 public var sourceBlockName : String;
@@ -233,8 +236,14 @@ function buildFromData(){
 			cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
 			GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
 	    }
+	    if(i==0){	    	pointOfMass=blockInstance.transform.position;
+		}
+		else{
+	    	pointOfMass=(pointOfMass+blockInstance.transform.position)/2;
+	    }
 	    holding=null;
 	}
+	pointOfMassIndicator.transform.position=pointOfMass;
 }
 
 function createJoints(blockInstance: GameObject){
@@ -390,7 +399,7 @@ function exitBuildingMode(){
 		buildingBlocks[i].GetComponent.<Rigidbody>().useGravity = true;
 		buildingBlocks[i].GetComponent.<Rigidbody>().isKinematic = false;
 		createJoints(buildingBlocks[i]);
-	}
+	} 
 }
 
 function Awake(){
@@ -411,7 +420,7 @@ function Start(){
 	loadBuiling();
 }
 
-function builder (){	
+function builder (){
 	if(buildingMode){
 		var ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		var hit : RaycastHit;
@@ -461,6 +470,8 @@ function builder (){
 					if(Input.GetMouseButtonDown(0))
 					{
 						saveBuilding();
+						pointOfMass=(pointOfMass+blockInstance.transform.position)/2;
+						pointOfMassIndicator.transform.position=pointOfMass;
 					}
 					else
 					{
