@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\hexaWorldGenerator.js" />
      <Compile Include="Assets\Scripts\playerProperties.js" />
      <Compile Include="Assets\Scripts\screenSize.js" />
+     <Compile Include="Assets\Scripts\stabilizer.js" />
      <Compile Include="Assets\Scripts\thrust.js" />
      <Compile Include="Assets\Scripts\update.js" />
      <None Include="Assets\Materials\NewShader.shader" />

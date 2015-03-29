@@ -38,6 +38,8 @@ public var blankBlock : GameObject;
 public var blankBlockName : String;
 public var thrustBlock : GameObject;
 public var thrustBlockName : String;
+public var stabilizerBlock : GameObject;
+public var stabilizerBlockName : String;
 
 function blockSelectBlank (){
 	holding=blankBlock;
@@ -46,6 +48,11 @@ function blockSelectBlank (){
 
 function blockSelectThrust (){
 	holding=thrustBlock;
+	removalMode=false;
+}
+
+function blockSelectStabilizer (){
+	holding=stabilizerBlock;
 	removalMode=false;
 }
 
@@ -143,6 +150,9 @@ function saveBuilding(){
 		if(taggedBuildingBlocks[i].name == thrustBlockName ){
 			buildingBlocks[i].type=2;
 		}
+		if(taggedBuildingBlocks[i].name == stabilizerBlockName ){
+			buildingBlocks[i].type=3;
+		}
 	}
 	//save data
 	var bf : BinaryFormatter = new BinaryFormatter();
@@ -190,6 +200,9 @@ function buildFromData(){
 			case 2:
 				holding=thrustBlock;
 				break;
+			case 3:
+				holding=stabilizerBlock;
+				break;
 		}
 		var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
 	    switch (buildingBlocks[i].orientation){
@@ -206,47 +219,53 @@ function buildFromData(){
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2+(1-blockHeightModifier)/2*blockHeight;
 		    	break;
 		    case 2:
-		    	rotation.eulerAngles.x=rotation.eulerAngles.x+270;
-		        blockPosition.z=buildingBlock.z*blockHeight+(1-blockHeightModifier)/2*blockHeight;
-		    	blockPosition.x=buildingBlock.x*blockHeight;
-		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
-		    	break;
-		    case 3:
-		        rotation.eulerAngles.x=rotation.eulerAngles.x+90;
+		    	rotation.eulerAngles.x=rotation.eulerAngles.x+90;
 		        blockPosition.z=buildingBlock.z*blockHeight-(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.x=buildingBlock.x*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		    	break;
+		    case 3:
+		        rotation.eulerAngles.x=rotation.eulerAngles.x+270;
+		        blockPosition.z=buildingBlock.z*blockHeight+(1-blockHeightModifier)/2*blockHeight;
+		    	blockPosition.x=buildingBlock.x*blockHeight;
+		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
+		    	break;
 		    case 4:
-		    	rotation.eulerAngles.z=rotation.eulerAngles.z+270;
+		    	rotation.eulerAngles.z=rotation.eulerAngles.z+90;
 		    	blockPosition.z=buildingBlock.z*blockHeight;
-		    	blockPosition.x=buildingBlock.x*blockHeight-(1-blockHeightModifier)/2*blockHeight;
+		    	blockPosition.x=buildingBlock.x*blockHeight+(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		    	break;
 		    case 5:
-		        rotation.eulerAngles.z=rotation.eulerAngles.z+90;
+		        rotation.eulerAngles.z=rotation.eulerAngles.z+270;
 		        blockPosition.z=buildingBlock.z*blockHeight;
-		    	blockPosition.x=buildingBlock.x*blockHeight+(1-blockHeightModifier)/2*blockHeight;
+		    	blockPosition.x=buildingBlock.x*blockHeight-(1-blockHeightModifier)/2*blockHeight;
 		    	blockPosition.y=buildingBlock.y*blockHeight+blockHeight/2;
 		        break;
 	    }
 	    blockInstance = Instantiate(holding,blockPosition,rotation)as GameObject;
 		blockInstance.transform.SetParent(player.transform,false);
 		if(blockInstance.name==sourceBlockName){
-			cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
-			GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
-	    }
-	    if(i==0){	    	pointOfMass=blockInstance.transform.position;
-		}
-		else{
-	    	pointOfMass=pointOfMass+blockInstance.transform.position;
+			sourceBlockInstance=blockInstance;
 	    }
 	    holding=null;
 	}
-	pointOfMass=pointOfMass/buildingBlocks.Count;
-	pointOfMassIndicator.transform.position=pointOfMass;
+	calcPointOfMass();
+	passSourceBlockInstance(sourceBlockInstance);
 }
-
+function passSourceBlockInstance(blockInstance:GameObject){
+	cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
+	GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
+	var taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
+		if(taggedBuildingBlocks[i].name == "stabilizerBlock(Clone)"){
+			Debug.Log("uhu");
+			taggedBuildingBlocks[i].GetComponent.<stabilizer>().pom = pointOfMass;
+         	taggedBuildingBlocks[i].GetComponent.<stabilizer>().sourceBlock = blockInstance;
+         	taggedBuildingBlocks[i].GetComponent.<stabilizer>().init();
+     	}
+ 	}
+}
 function createJoints(blockInstance: GameObject){
 	var newBlockPosition:Vector3=blockInstance.GetComponent.<Rigidbody>().position;
 	var hitAttachablePY : boolean; 
@@ -288,6 +307,7 @@ function createJoints(blockInstance: GameObject){
 			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
 			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
 				joint = blockInstance.AddComponent.<FixedJoint>();
+				Debug.Log(newBlockPosition +" "+blockInstance.name + " " + hit.collider.gameObject.GetComponent.<Rigidbody>());
 				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
 				joint.breakForce = breakForce;
 				joint.breakTorque = breakTorque;
@@ -378,7 +398,20 @@ function removeJoints(blockInstance: GameObject){
 		}
 	}
 }
-
+function calcPointOfMass(){
+	var taggedBuildingBlocks: GameObject[];
+	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	pointOfMass=taggedBuildingBlocks[0].transform.position;
+	Debug.Log(pointOfMass);
+	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
+		if(i!=0){
+			pointOfMass=pointOfMass+taggedBuildingBlocks[i].transform.position;
+		}
+	}
+	pointOfMass=pointOfMass/taggedBuildingBlocks.length;
+	pointOfMassIndicator.transform.position=pointOfMass;
+	Debug.Log(pointOfMass);
+}
 function enterBuildingMode(){
 	buildingMode=true;
 	loadBuiling();
@@ -413,8 +446,8 @@ function Awake(){
 	initPosition.z=0;
 	blockInstance = Instantiate(sourceBlock,initPosition, initRotation)as GameObject;
 	blockInstance.transform.SetParent(player.transform,false);
-	cam.GetComponent.<cameraMovement>().target = blockInstance.transform;
-	GameObject.Find("Scripting").GetComponent.<hexaWorldGenerator>().player = blockInstance;
+	sourceBlockInstance=blockInstance;
+	passSourceBlockInstance(blockInstance);
 }
 
 function Start(){
@@ -433,6 +466,7 @@ function builder (){
 					if(Input.GetMouseButtonDown(0)){
 						DestroyImmediate(hitObject);
 						saveBuilding();
+						calcPointOfMass();
 					}
 					else{
 						//temporary change material
@@ -459,8 +493,8 @@ function builder (){
 					//calc rotation
 					//var rotation : Quaternion = hit.collider.gameObject.GetComponent.<Rigidbody>().rotation;
 					var rotation : Quaternion;
-					rotation.eulerAngles.x = rotation.eulerAngles.x-(90*hit.normal.z);
-					rotation.eulerAngles.z = rotation.eulerAngles.z+(90*hit.normal.x);
+					rotation.eulerAngles.x = rotation.eulerAngles.x+(90*hit.normal.z);
+					rotation.eulerAngles.z = rotation.eulerAngles.z-(90*hit.normal.x);
 					if(Math.Round(hit.normal.y)<0){
 						rotation.eulerAngles.x = rotation.eulerAngles.x+(180*hit.normal.y);
 					}
@@ -471,8 +505,7 @@ function builder (){
 					if(Input.GetMouseButtonDown(0))
 					{
 						saveBuilding();
-						pointOfMass=(pointOfMass+blockInstance.transform.position)/2;
-						pointOfMassIndicator.transform.position=pointOfMass;
+						calcPointOfMass();
 					}
 					else
 					{
