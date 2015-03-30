@@ -6,7 +6,7 @@ public var pom:Vector3;
 public var stabilizer:GameObject;
 public var sourceBlock:GameObject;
 public var maxThrust:float=100;
-private var amplitude:float=300;
+private var amplitude:float=500;
 
 private var y:float;
 private var x:float;
