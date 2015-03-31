@@ -1,14 +1,14 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\buildingMode.js">
     <Files>
-      <File FileName="Assets\Scripts\buildingMode.js" Line="493" Column="22" />
+      <File FileName="Assets\Scripts\buildingMode.js" Line="506" Column="6" />
       <File FileName="Assets\Scripts\thrust.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\hexaWorldGenerator.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\blockPropperties.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\cameraMovement.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\update.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\stabilizer.js" Line="9" Column="30" />
+      <File FileName="Assets\Scripts\stabilizer.js" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

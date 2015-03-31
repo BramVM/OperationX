@@ -4,6 +4,8 @@ import System.Collections.Generic;
 import System;
 import System.Runtime.Serialization.Formatters.Binary;
 import System.IO;
+import UnityEngine;
+import UnityEngine.UI;
 
 public class blockData{
 	var type : int;
@@ -21,9 +23,11 @@ public var buildingMode : boolean = true;
 public var deleteMaterial: Material;
 public var placeholderMaterial: Material;
 public var pointOfMassIndicator:GameObject;
+public var controlePannel:GameObject;
 
 private var joint: FixedJoint;
 private	var buildingBlocks = new List.<blockData>();
+private var controleMode : boolean = false;
 private var removalMode : boolean = false;
 private var cam : GameObject;
 private var holding : GameObject;
@@ -44,16 +48,19 @@ public var stabilizerBlockName : String;
 function blockSelectBlank (){
 	holding=blankBlock;
 	removalMode=false;
+	controleMode=false;
 }
 
 function blockSelectThrust (){
 	holding=thrustBlock;
 	removalMode=false;
+	controleMode=false;
 }
 
 function blockSelectStabilizer (){
 	holding=stabilizerBlock;
 	removalMode=false;
+	controleMode=false;
 }
 
 function restoreTempMaterial(){
@@ -72,6 +79,7 @@ function removePlaceholders(){
 }
 
 function toggleRemovalMode(){
+	controleMode=false;
 	if(removalMode){
 		removalMode=false;
 	}
@@ -80,6 +88,16 @@ function toggleRemovalMode(){
 	}
 	restoreTempMaterial();
 	removePlaceholders();
+}
+
+function toggleControleMode(){
+	removalMode=false;
+	if(controleMode){
+		controleMode=false;
+	}
+	else{
+		controleMode=true;
+	}
 }
 
 function saveBuilding(){
@@ -413,6 +431,8 @@ function calcPointOfMass(){
 	Debug.Log(pointOfMass);
 }
 function enterBuildingMode(){
+	removalMode=false;
+	controleMode=false;
 	buildingMode=true;
 	loadBuiling();
 	var buildingBlocks: GameObject[];
@@ -477,6 +497,15 @@ function builder (){
 				}
 			}
 		}
+		if(controleMode){
+			if (Physics.Raycast (ray,hit)){
+				if(hit.collider.tag=="buildingBlock"){
+					if(Input.GetMouseButtonDown(0)){
+						controlePannel.SetActive(true);
+					}
+				}
+			}
+		}
 		else{
 			removePlaceholders();
 			if (Physics.Raycast (ray,hit)&&holding!=null){
@@ -503,13 +532,11 @@ function builder (){
 						var blockInstance : GameObject;
 						blockInstance = Instantiate(holding,position,rotation)as GameObject;
 						blockInstance.transform.SetParent(player.transform,false);
-						if(Input.GetMouseButtonDown(0))
-						{
+						if(Input.GetMouseButtonDown(0)){
 							saveBuilding();
 							calcPointOfMass();
 						}
-						else
-						{
+						else{
 							//change it into a placeholder
 							DestroyImmediate(blockInstance.transform.GetComponent.<BoxCollider>());
 							if(blockInstance.transform.Find('Cube')!=null){
