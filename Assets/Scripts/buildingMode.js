@@ -486,35 +486,37 @@ function builder (){
 					position.z = position.z+(blockHeight*hit.normal.z);
 					position.x = position.x+(blockHeight*hit.normal.x);
 					position.y = position.y+(blockHeight*hit.normal.y);
-					var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
-					position.x = position.x-((1-blockHeightModifier)/2*blockHeight*hit.normal.x);
-					position.y = position.y-((1-blockHeightModifier)/2*blockHeight*hit.normal.y);
-					position.z = position.z-((1-blockHeightModifier)/2*blockHeight*hit.normal.z);
-					//calc rotation
-					//var rotation : Quaternion = hit.collider.gameObject.GetComponent.<Rigidbody>().rotation;
-					var rotation : Quaternion;
-					rotation.eulerAngles.x = rotation.eulerAngles.x+(90*hit.normal.z);
-					rotation.eulerAngles.z = rotation.eulerAngles.z-(90*hit.normal.x);
-					if(Math.Round(hit.normal.y)<0){
-						rotation.eulerAngles.x = rotation.eulerAngles.x+(180*hit.normal.y);
-					}
-					//create Block
-					var blockInstance : GameObject;
-					blockInstance = Instantiate(holding,position,rotation)as GameObject;
-					blockInstance.transform.SetParent(player.transform,false);
-					if(Input.GetMouseButtonDown(0))
-					{
-						saveBuilding();
-						calcPointOfMass();
-					}
-					else
-					{
-						//change it into a placeholder
-						DestroyImmediate(blockInstance.transform.GetComponent.<BoxCollider>());
-						if(blockInstance.transform.Find('Cube')!=null){
-							blockInstance.transform.Find('Cube').transform.GetComponent.<Renderer>().material=placeholderMaterial;
+					//var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
+					//position.x = position.x-((1-blockHeightModifier)/2*blockHeight*hit.normal.x);
+					//position.y = position.y-((1-blockHeightModifier)/2*blockHeight*hit.normal.y);
+					//position.z = position.z-((1-blockHeightModifier)/2*blockHeight*hit.normal.z);
+					//if connectable
+					if( (Mathf.Round(hit.normal.y)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY==true) || (Mathf.Round(hit.normal.y)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY==true) || (Mathf.Round(hit.normal.x)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX==true) || (Mathf.Round(hit.normal.x)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX==true) || (Mathf.Round(hit.normal.z)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ==true) || (Mathf.Round(hit.normal.z)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ==true)){
+						//calc rotation
+						var rotation : Quaternion;
+						rotation.eulerAngles.x = rotation.eulerAngles.x+(90*hit.normal.z);
+						rotation.eulerAngles.z = rotation.eulerAngles.z-(90*hit.normal.x);
+						if(Math.Round(hit.normal.y)<0){
+							rotation.eulerAngles.x = rotation.eulerAngles.x+(180*hit.normal.y);
 						}
-						blockInstance.tag="placeholder";
+						//create Block
+						var blockInstance : GameObject;
+						blockInstance = Instantiate(holding,position,rotation)as GameObject;
+						blockInstance.transform.SetParent(player.transform,false);
+						if(Input.GetMouseButtonDown(0))
+						{
+							saveBuilding();
+							calcPointOfMass();
+						}
+						else
+						{
+							//change it into a placeholder
+							DestroyImmediate(blockInstance.transform.GetComponent.<BoxCollider>());
+							if(blockInstance.transform.Find('Cube')!=null){
+								blockInstance.transform.Find('Cube').transform.GetComponent.<Renderer>().material=placeholderMaterial;
+							}
+							blockInstance.tag="placeholder";
+						}
 					}
 				}
 			}	
