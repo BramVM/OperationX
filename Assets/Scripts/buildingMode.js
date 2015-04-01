@@ -23,7 +23,6 @@ public var buildingMode : boolean = true;
 public var deleteMaterial: Material;
 public var placeholderMaterial: Material;
 public var pointOfMassIndicator:GameObject;
-public var controlePannel:GameObject;
 
 private var joint: FixedJoint;
 private	var buildingBlocks = new List.<blockData>();
@@ -85,6 +84,7 @@ function toggleRemovalMode(){
 	}
 	else{
 		removalMode=true;
+		holding=null;
 	}
 	restoreTempMaterial();
 	removePlaceholders();
@@ -97,6 +97,7 @@ function toggleControleMode(){
 	}
 	else{
 		controleMode=true;
+		holding=null;
 	}
 }
 
@@ -501,7 +502,7 @@ function builder (){
 			if (Physics.Raycast (ray,hit)){
 				if(hit.collider.tag=="buildingBlock"){
 					if(Input.GetMouseButtonDown(0)){
-						controlePannel.SetActive(true);
+						GameObject.Find('Scripting').GetComponent.<controleSettings>().setControleOptions(hit.collider.gameObject);
 					}
 				}
 			}

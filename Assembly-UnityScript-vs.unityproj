@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\blockPropperties.js" />
      <Compile Include="Assets\Scripts\buildingMode.js" />
      <Compile Include="Assets\Scripts\cameraMovement.js" />
+     <Compile Include="Assets\Scripts\controleSettings.js" />
      <Compile Include="Assets\Scripts\hexaWorldGenerator.js" />
      <Compile Include="Assets\Scripts\playerProperties.js" />
      <Compile Include="Assets\Scripts\screenSize.js" />

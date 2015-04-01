@@ -5,6 +5,7 @@ public var tile : GameObject;
 public var midTile:GameObject;
 public var grid_x : float;
 public var generatorRange:int;
+public var floorMaterial:Material;
 
 private var midTilePosition:Vector3;
 private var prevMidTilePosition:Vector3;
@@ -54,23 +55,8 @@ function initTiles(){
 		}
 		var xCount:int=0;
 		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			if(xCount==0&&zRowCount==1){
-				newPos.y = seed(newPos.x,newPos.z);
-				tileInstance = Instantiate(midTile,newPos,tile.transform.rotation )as GameObject;
-				drawHexagonMesh(tileInstance);
-				//tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
-				newPos.x=newPos.x+grid_x*2;
-				xCount++;
-			}
-			else{
-				newPos.y = seed(newPos.x,newPos.z);
-				tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-				//tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
-				newPos.x=newPos.x+grid_x*2;
-				xCount++;
-			}
 			tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-			tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+			drawHexagonMesh(tileInstance);
 			newPos.x=newPos.x+grid_x*2;
 			xCount++;
 		}
@@ -87,9 +73,8 @@ function initTiles(){
 			newPos.x=newPos.x+grid_x;
 		}
 		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			newPos.y = seed(newPos.x,newPos.z);
 			tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-			tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+			drawHexagonMesh(tileInstance);
 			newPos.x=newPos.x-grid_x*2;
 		}
 		newPos.x=midTilePosition.x-grid_x*2;
@@ -105,12 +90,11 @@ function initTiles(){
 			newPos.x=newPos.x+grid_x;
 		}
 		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			newPos.y = seed(newPos.x,newPos.z);
 			tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-			tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+			drawHexagonMesh(tileInstance);
 			newPos.x=newPos.x+grid_x*2;
 		}
-		newPos.x=midTilePosition.x;
+		newPos.x=midTilePosition.x*2;
 		newPos.z=newPos.z-grid_z;
 	}
 	//botLeftQuarter
@@ -124,9 +108,8 @@ function initTiles(){
 			newPos.x=newPos.x+grid_x;
 		}
 		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			newPos.y = seed(newPos.x,newPos.z);
 			tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-			tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+			drawHexagonMesh(tileInstance);
 			newPos.x=newPos.x-grid_x*2;
 		}
 		newPos.x=midTilePosition.x-grid_x*2;
@@ -156,9 +139,9 @@ function seed(x:float,z:float){
 	}
 	return result;
 }
-private var Vertices: Vector3[] = new Vector3[9];
-private var UV: Vector2[] = new Vector2[9];
-private var Triangles:int[] = new int[9];
+private var Vertices: Vector3[] = new Vector3[12];
+private var UV: Vector2[] = new Vector2[12];
+private var Triangles:int[] = new int[12];
 function drawHexagonMesh(tile:GameObject){
 
 	/*var newVertices : Vector3[];
@@ -179,20 +162,26 @@ function drawHexagonMesh(tile:GameObject){
     stuff.uv = UV;
     tile.AddComponent.<MeshFilter>().mesh = stuff;
     tile.AddComponent.<MeshRenderer>();
+    tile.GetComponent.<Renderer>().material=floorMaterial;
+    tile.AddComponent.<MeshCollider>().sharedMesh = stuff;
 }
 function MeshSetup(mid:Vector3){
 	//zxy
-	var zPoint1=grid_x/Mathf.Tan(60);
-	var zPoint2=grid_z-2*zPoint1;
- 	Vertices[0] = new Vector3(zPoint1,-grid_x,mid.y);
- 	Vertices[1] = new Vector3(zPoint1,grid_x,mid.y);
- 	Vertices[2] = new Vector3(-zPoint1,grid_x,mid.y);
- 	Vertices[3] = new Vector3(zPoint1,-grid_x,mid.y);
- 	Vertices[4] = new Vector3(-zPoint1,-grid_x,mid.y);
- 	Vertices[5] = new Vector3(-zPoint1,grid_x,mid.y);
- 	Vertices[6] = new Vector3(-zPoint1,grid_x,mid.y);
- 	Vertices[7] = new Vector3(-zPoint1,-grid_x,mid.y);
- 	Vertices[8] = new Vector3(-zPoint2,0,mid.y);
+	var hexSide = 2*grid_x/Mathf.Tan(60*Mathf.PI/180);
+	Debug.Log(hexSide);
+	Debug.Log(grid_x);
+ 	Vertices[0] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z+hexSide/2),hexSide/2);
+ 	Vertices[1] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z+hexSide/2),hexSide/2);
+ 	Vertices[2] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z-hexSide/2),-hexSide/2);
+ 	Vertices[3] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z+hexSide/2),hexSide/2);
+ 	Vertices[4] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z-hexSide/2),-hexSide/2);
+ 	Vertices[5] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z-hexSide/2),-hexSide/2);
+ 	Vertices[6] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z-hexSide/2),-hexSide/2);
+ 	Vertices[7] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z-hexSide/2),-hexSide/2);
+ 	Vertices[8] = new Vector3(0,seed(mid.x,mid.z-hexSide),-hexSide);
+ 	Vertices[9] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z+hexSide/2),hexSide/2);
+ 	Vertices[10] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z+hexSide/2),hexSide/2);
+ 	Vertices[11] = new Vector3(0,seed(mid.x,mid.z+hexSide),hexSide);
  	UV[0] = new Vector2(0,256);
  	UV[1] = new Vector2(256,256);
  	UV[2] = new Vector2(256,0);
@@ -202,33 +191,27 @@ function MeshSetup(mid:Vector3){
  	UV[6] = new Vector2(0,256);
  	UV[7] = new Vector2(256,256);
  	UV[8] = new Vector2(256,0);
- 	Triangles[0] = 2;
+ 	UV[10] = new Vector2(0,256);
+ 	UV[11] = new Vector2(256,256);
+ 	Triangles[0] = 0;
  	Triangles[1] = 1;
- 	Triangles[2] = 0;
- 	Triangles[3] = 3;
+ 	Triangles[2] = 2;
+ 	Triangles[3] = 5;
  	Triangles[4] = 4;
- 	Triangles[5] = 5;
+ 	Triangles[5] = 3;
  	Triangles[6] = 8;
  	Triangles[7] = 7;
  	Triangles[8] = 6;
- 	
+ 	Triangles[9] = 9;
+ 	Triangles[10] = 10;
+ 	Triangles[11] = 11;	
 }
 function generateWorld(){
 	checkMidTilePosition();
 	if(prevMidTilePosition != midTilePosition){
-		Debug.Log(prevMidTilePosition + " "+midTilePosition);
-		var translation:Vector3;
-		translation.x = prevMidTilePosition.x-midTilePosition.x;
-		translation.z = prevMidTilePosition.z-midTilePosition.z;
-		Debug.Log(translation.x);
-		Debug.Log(translation.z);
-		var tiles= new GameObject[0];
-		tiles = GameObject.FindGameObjectsWithTag ("tile");
-		for(var i : int = 0; i < tiles.length; i++){
-			tiles[i].transform.position.x = tiles[i].transform.position.x-translation.x;
-			tiles[i].transform.position.z = tiles[i].transform.position.z-translation.z;
-			tiles[i].transform.position.y = seed(tiles[i].transform.position.x,tiles[i].transform.position.z);
-		}
+		//destroy out of reach
+		
+		//if none existing 
 		
 	}
 	prevMidTilePosition = midTilePosition;
