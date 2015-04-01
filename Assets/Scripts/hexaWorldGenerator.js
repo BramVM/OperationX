@@ -1,4 +1,5 @@
 ﻿#pragma strict
+import System.Collections.Generic;
 public var player : GameObject;
 public var tile : GameObject;
 public var midTile:GameObject;
@@ -11,8 +12,7 @@ private var tileInstance : GameObject;
 
 private var tileScale;
 private var grid_z : float;
-
-function initTiles(){
+function checkMidTilePosition(){
 	/*get player position*/
 	var playerPos_x = player.transform.position.x;
 	var playerPos_z = player.transform.position.z;
@@ -41,6 +41,9 @@ function initTiles(){
 		}
 	}
 	midTilePosition.y=midTilePosition.y;
+}
+function initTiles(){
+	checkMidTilePosition();
 	//topRightQuarter
 	var newPos = midTilePosition;
 	var zRowCount:int=0;
@@ -54,14 +57,15 @@ function initTiles(){
 			if(xCount==0&&zRowCount==1){
 				newPos.y = seed(newPos.x,newPos.z);
 				tileInstance = Instantiate(midTile,newPos,tile.transform.rotation )as GameObject;
-				tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+				drawHexagonMesh(tileInstance);
+				//tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 				newPos.x=newPos.x+grid_x*2;
 				xCount++;
 			}
 			else{
 				newPos.y = seed(newPos.x,newPos.z);
 				tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-				tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+				//tileInstance.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
 				newPos.x=newPos.x+grid_x*2;
 				xCount++;
 			}
@@ -152,35 +156,65 @@ function seed(x:float,z:float){
 	}
 	return result;
 }
+private var Vertices: Vector3[] = new Vector3[9];
+private var UV: Vector2[] = new Vector2[9];
+private var Triangles:int[] = new int[9];
+function drawHexagonMesh(tile:GameObject){
+
+	/*var newVertices : Vector3[];
+	var newUV : Vector2[];
+	var newTriangles : int[];
+
+	var mesh : Mesh = new Mesh ();
+	GetComponent.<MeshFilter>().mesh = mesh;
+	mesh.vertices = newVertices;
+	mesh.uv = newUV;
+	mesh.triangles = newTriangles;
+	tile.material = deleteMaterial;*/
+ 
+ 	MeshSetup(tile.transform.position);
+    var stuff:Mesh  = new Mesh();
+    stuff.vertices = Vertices;
+    stuff.triangles = Triangles;
+    stuff.uv = UV;
+    tile.AddComponent.<MeshFilter>().mesh = stuff;
+    tile.AddComponent.<MeshRenderer>();
+}
+function MeshSetup(mid:Vector3){
+	//zxy
+	var zPoint1=grid_x/Mathf.Tan(60);
+	var zPoint2=grid_z-2*zPoint1;
+ 	Vertices[0] = new Vector3(zPoint1,-grid_x,mid.y);
+ 	Vertices[1] = new Vector3(zPoint1,grid_x,mid.y);
+ 	Vertices[2] = new Vector3(-zPoint1,grid_x,mid.y);
+ 	Vertices[3] = new Vector3(zPoint1,-grid_x,mid.y);
+ 	Vertices[4] = new Vector3(-zPoint1,-grid_x,mid.y);
+ 	Vertices[5] = new Vector3(-zPoint1,grid_x,mid.y);
+ 	Vertices[6] = new Vector3(-zPoint1,grid_x,mid.y);
+ 	Vertices[7] = new Vector3(-zPoint1,-grid_x,mid.y);
+ 	Vertices[8] = new Vector3(-zPoint2,0,mid.y);
+ 	UV[0] = new Vector2(0,256);
+ 	UV[1] = new Vector2(256,256);
+ 	UV[2] = new Vector2(256,0);
+ 	UV[3] = new Vector2(0,256);
+ 	UV[4] = new Vector2(256,256);
+ 	UV[5] = new Vector2(256,0);
+ 	UV[6] = new Vector2(0,256);
+ 	UV[7] = new Vector2(256,256);
+ 	UV[8] = new Vector2(256,0);
+ 	Triangles[0] = 2;
+ 	Triangles[1] = 1;
+ 	Triangles[2] = 0;
+ 	Triangles[3] = 3;
+ 	Triangles[4] = 4;
+ 	Triangles[5] = 5;
+ 	Triangles[6] = 8;
+ 	Triangles[7] = 7;
+ 	Triangles[8] = 6;
+ 	
+}
 function generateWorld(){
-	/*get player position*/
-	var playerPos_x = player.transform.position.x;
-	var playerPos_z = player.transform.position.z;
-	/*get amount of gridlines between player position and origin*/
-	var gridNumber_x:int = Mathf.RoundToInt(playerPos_x / grid_x);
-	var gridNumber_z:int = Mathf.RoundToInt(playerPos_z / grid_z);
-	//check wich z-grid line is closest
-	midTilePosition.x=gridNumber_x*grid_x;
-	midTilePosition.z=gridNumber_z*grid_z;
-	if(Mathf.Abs(gridNumber_z%2)-Mathf.Abs(gridNumber_x%2)!=0){
-		if(gridNumber_x%grid_x>gridNumber_z%grid_z){
-			if(gridNumber_x*grid_x-playerPos_x<0){
-				midTilePosition.x=(gridNumber_x+1)*grid_x;
-			}
-			else{
-				midTilePosition.x=(gridNumber_x-1)*grid_x;
-			}
-		}
-		else{
-			if(gridNumber_z*grid_z-playerPos_z<0){
-				midTilePosition.z=(gridNumber_z+1)*grid_z;
-			}
-			else{
-				midTilePosition.z=(gridNumber_z-1)*grid_z;
-			}
-		}
-	}
-	
+	checkMidTilePosition();
 	if(prevMidTilePosition != midTilePosition){
 		Debug.Log(prevMidTilePosition + " "+midTilePosition);
 		var translation:Vector3;
