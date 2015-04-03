@@ -264,6 +264,7 @@ function buildFromData(){
 	    }
 	    blockInstance = Instantiate(holding,blockPosition,rotation)as GameObject;
 		blockInstance.transform.SetParent(player.transform,false);
+		blockInstance.GetComponent(blockPropperties).id=i;
 		if(blockInstance.name==sourceBlockName){
 			sourceBlockInstance=blockInstance;
 	    }

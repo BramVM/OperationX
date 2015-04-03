@@ -1,4 +1,5 @@
 ﻿#pragma strict
+public var id:int;
 public var OffsetY:float;
 public var instance:GameObject;
 public var proportionalHeight:float;

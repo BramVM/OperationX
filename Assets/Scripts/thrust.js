@@ -2,6 +2,7 @@
 public var thrust: float;
 public var thruster: GameObject;
 public var thrustLight: GameObject;
+public var key: String="";
 
 private var minIntensity = 1;
 private var maxIntensity = 7;
@@ -54,15 +55,14 @@ function FixedUpdate () {
 	
 	thrustLight.GetComponent.<ParticleSystem>().startLifetime =0.01;
 	thrustLight.GetComponent.<Light>().intensity =0;
-	if (Input.GetKey ("return")){
-		thruster.GetComponent.<Rigidbody>().AddForce(-transform.up * thrust);
-		thrustLight.GetComponent.<ParticleSystem>().startLifetime =0.1;
-		var noise = Mathf.PerlinNoise(random, Time.time*10);
-		thrustLight.GetComponent.<Light>().intensity = Mathf.Lerp(minIntensity, maxIntensity, noise);
+	Debug.Log(key);
+	if(key.Length>0){
+		if (Input.GetKey(key)){
+			thruster.GetComponent.<Rigidbody>().AddForce(-transform.up * thrust);
+			thrustLight.GetComponent.<ParticleSystem>().startLifetime =0.1;
+			var noise = Mathf.PerlinNoise(random, Time.time*10);
+			thrustLight.GetComponent.<Light>().intensity = Mathf.Lerp(minIntensity, maxIntensity, noise);
+		}
 	}
-}
-
-function Update () {
-
 }
 
