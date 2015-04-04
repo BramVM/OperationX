@@ -52,10 +52,8 @@ function Start() {
 }
 
 function FixedUpdate () {
-	
 	thrustLight.GetComponent.<ParticleSystem>().startLifetime =0.01;
 	thrustLight.GetComponent.<Light>().intensity =0;
-	Debug.Log(key);
 	if(key.Length>0){
 		if (Input.GetKey(key)){
 			thruster.GetComponent.<Rigidbody>().AddForce(-transform.up * thrust);

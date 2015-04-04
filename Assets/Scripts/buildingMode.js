@@ -110,13 +110,14 @@ function saveBuilding(){
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
 		buildingBlocks.Add(new blockData());
 		//orientation & position
-		var yPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.y+blockHeight/2;
-		var xPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.x;
-		var zPosition = taggedBuildingBlocks[i].GetComponent.<Rigidbody>().position.z;
-		var blockHeightModifier = taggedBuildingBlocks[i].GetComponent.<blockPropperties>().proportionalHeight;
-		var xRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.x);
-		var yRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.y);
-		var zRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].GetComponent.<Rigidbody>().rotation.eulerAngles.z);
+		var yPosition = taggedBuildingBlocks[i].transform.position.y+blockHeight/2;
+		var xPosition = taggedBuildingBlocks[i].transform.position.x;
+		var zPosition = taggedBuildingBlocks[i].transform.position.z;
+		//var blockHeightModifier = taggedBuildingBlocks[i].GetComponent(blockPropperties).proportionalHeight;
+		var blockHeightModifier =1;
+		var xRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].transform.rotation.eulerAngles.x);
+		var yRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].transform.rotation.eulerAngles.y);
+		var zRotation = Mathf.RoundToInt(taggedBuildingBlocks[i].transform.rotation.eulerAngles.z);
 	    if (xRotation==0){
 	    	buildingBlocks[i].orientation=0;
 	    	yPosition = yPosition+((1-blockHeightModifier)/2*blockHeight);
@@ -193,6 +194,7 @@ function loadBuiling(){
 		buildingBlocks = bf.Deserialize(file);
 		file.Close();
 		buildFromData();
+		GameObject.Find("Scripting").GetComponent(controleSettings).loadControles();
 	}
 }
 
@@ -279,12 +281,50 @@ function passSourceBlockInstance(blockInstance:GameObject){
 	var taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
 		if(taggedBuildingBlocks[i].name == "stabilizerBlock(Clone)"){
-			Debug.Log("uhu");
 			taggedBuildingBlocks[i].GetComponent.<stabilizer>().pom = pointOfMass;
          	taggedBuildingBlocks[i].GetComponent.<stabilizer>().sourceBlock = blockInstance;
          	taggedBuildingBlocks[i].GetComponent.<stabilizer>().init();
      	}
  	}
+}
+function canAttach(hit:RaycastHit){
+	if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
+		switch (hit.normal){
+		case hit.transform.up:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY){
+				return true;
+			}
+			break;
+		case hit.transform.up*-1:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY){
+				return true;
+			}
+			break;
+		case hit.transform.right:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX){
+				return true;
+			}
+			break;
+		case hit.transform.right*-1:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX){
+				return true;
+			}
+			break;
+		case hit.transform.forward:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ){
+				return true;
+			}
+			break;
+		case hit.transform.forward*-1:
+			if(hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ){
+				return true;
+			}
+			break;
+		default:
+			return false;
+			break;
+		}
+	}
 }
 function createJoints(blockInstance: GameObject){
 	var newBlockPosition:Vector3=blockInstance.GetComponent.<Rigidbody>().position;
@@ -301,103 +341,63 @@ function createJoints(blockInstance: GameObject){
 	var left: Vector3=blockInstance.transform.right*-1;
 	var front: Vector3=blockInstance.transform.forward;
 	var back: Vector3=blockInstance.transform.forward*-1;
+	var canAttach=false;
+	blockInstance.layer=2;
 	if (Physics.Raycast(newBlockPosition,up,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePY){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,down,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNY){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				Debug.Log(newBlockPosition +" "+blockInstance.name + " " + hit.collider.gameObject.GetComponent.<Rigidbody>());
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,right,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePX){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,left,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNX){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,front,hit) && blockInstance.GetComponent.<blockPropperties>().attachablePZ){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
 	if (Physics.Raycast(newBlockPosition,back,hit) && blockInstance.GetComponent.<blockPropperties>().attachableNZ){
-		if(hit.distance<blockHeight&&hit.collider.tag=="buildingBlock"){
-			hitAttachablePY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY;
-			hitAttachableNY = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY;
-			hitAttachablePX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX;
-			hitAttachableNX = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX;
-			hitAttachablePZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ;
-			hitAttachableNZ = hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ;
-			if((Mathf.RoundToInt(hit.normal.y)==-1&&hitAttachableNY)||(Mathf.RoundToInt(hit.normal.y)==1&&hitAttachablePY)||(Mathf.RoundToInt(hit.normal.x)==-1&&hitAttachableNX)||(Mathf.RoundToInt(hit.normal.x)==1&&hitAttachablePX)||(Mathf.RoundToInt(hit.normal.z)==-1&&hitAttachableNZ)||(Mathf.RoundToInt(hit.normal.z)==1&&hitAttachablePZ)){
-				joint = blockInstance.AddComponent.<FixedJoint>();
-				joint.connectedBody = hit.collider.gameObject.GetComponent.<Rigidbody>();
-				joint.breakForce = breakForce;
-				joint.breakTorque = breakTorque;
-			}
+		if(canAttach(hit)){
+			joint = blockInstance.AddComponent(FixedJoint);
+			Debug.Log(blockInstance.name+ " " + hit.distance);
+			joint.connectedBody = hit.collider.gameObject.GetComponent(Rigidbody);
+			joint.breakForce = breakForce;
+			joint.breakTorque = breakTorque;
 		}
 	}
+	blockInstance.layer=0;
 }
 
 function removeJoints(blockInstance: GameObject){
@@ -422,7 +422,7 @@ function calcPointOfMass(){
 	var taggedBuildingBlocks: GameObject[];
 	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
 	pointOfMass=taggedBuildingBlocks[0].transform.position;
-	Debug.Log(pointOfMass);
+	//Debug.Log(pointOfMass);
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
 		if(i!=0){
 			pointOfMass=pointOfMass+taggedBuildingBlocks[i].transform.position;
@@ -430,7 +430,7 @@ function calcPointOfMass(){
 	}
 	pointOfMass=pointOfMass/taggedBuildingBlocks.length;
 	pointOfMassIndicator.transform.position=pointOfMass;
-	Debug.Log(pointOfMass);
+	//Debug.Log(pointOfMass);
 }
 function enterBuildingMode(){
 	removalMode=false;

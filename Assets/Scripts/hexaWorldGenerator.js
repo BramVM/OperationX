@@ -143,18 +143,6 @@ private var Vertices: Vector3[] = new Vector3[12];
 private var UV: Vector2[] = new Vector2[12];
 private var Triangles:int[] = new int[12];
 function drawHexagonMesh(tile:GameObject){
-
-	/*var newVertices : Vector3[];
-	var newUV : Vector2[];
-	var newTriangles : int[];
-
-	var mesh : Mesh = new Mesh ();
-	GetComponent.<MeshFilter>().mesh = mesh;
-	mesh.vertices = newVertices;
-	mesh.uv = newUV;
-	mesh.triangles = newTriangles;
-	tile.material = deleteMaterial;*/
- 
  	MeshSetup(tile.transform.position);
     var stuff:Mesh  = new Mesh();
     stuff.vertices = Vertices;
@@ -166,10 +154,7 @@ function drawHexagonMesh(tile:GameObject){
     tile.AddComponent.<MeshCollider>().sharedMesh = stuff;
 }
 function MeshSetup(mid:Vector3){
-	//zxy
 	var hexSide = 2*grid_x/Mathf.Tan(60*Mathf.PI/180);
-	Debug.Log(hexSide);
-	Debug.Log(grid_x);
  	Vertices[0] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z+hexSide/2),hexSide/2);
  	Vertices[1] = new Vector3(grid_x,seed(mid.x+grid_x,mid.z+hexSide/2),hexSide/2);
  	Vertices[2] = new Vector3(-grid_x,seed(mid.x-grid_x,mid.z-hexSide/2),-hexSide/2);

@@ -1,12 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\controleSettings.js">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\buildingMode.js">
     <Files>
-      <File FileName="Assets\Scripts\controleSettings.js" Line="47" Column="14" />
-      <File FileName="Assets\Scripts\hexaWorldGenerator.js" Line="214" Column="22" />
-      <File FileName="Assets\Scripts\buildingMode.js" Line="110" Column="2" />
+      <File FileName="Assets\Scripts\controleSettings.js" Line="43" Column="57" />
+      <File FileName="Assets\Scripts\hexaWorldGenerator.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\buildingMode.js" Line="397" Column="4" />
       <File FileName="Assets\Scripts\thrust.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\blockPropperties.js" Line="2" Column="18" />
+      <File FileName="Assets\Scripts\blockPropperties.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\cameraMovement.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\update.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\stabilizer.js" Line="1" Column="1" />
