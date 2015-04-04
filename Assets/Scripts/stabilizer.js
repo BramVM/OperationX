@@ -1,12 +1,19 @@
 ﻿#pragma strict
 
-@script RequireComponent(Light);
+//@script RequireComponent(Light);
 
 public var pom:Vector3;
 public var stabilizer:GameObject;
 public var sourceBlock:GameObject;
 public var maxThrust:float=100;
 private var amplitude:float=500;
+public var fire1: GameObject;
+public var fire2: GameObject;
+public var fire3: GameObject;
+public var fire4: GameObject;
+public var fire5: GameObject;
+public var fire6: GameObject;
+public var fire7: GameObject;
 
 private var y:float;
 private var x:float;
@@ -63,8 +70,6 @@ function FixedUpdate () {
 				wrongx=Mathf.PI-wrongx;
 				wrongx=wrongx*amplitude;
 			}
-			if(wrongx>maxThrust){wrongx=maxThrust;}
-			if(wrongx<0){wrongx=0;}
 		}
 		if(alphax%360<0&&alphax%360>-180){
 			wrongx = sourceBlock.transform.rotation.eulerAngles.z*Mathf.PI/180;
@@ -78,8 +83,6 @@ function FixedUpdate () {
 				wrongx=wrongx/2;
 				wrongx=wrongx*amplitude;
 			}
-			if(wrongx>maxThrust){wrongx=maxThrust;}
-			if(wrongx<0){wrongx=0;}
 		}
 		
 		if(alphaz%360<0&&alphaz%360>-180){
@@ -94,8 +97,6 @@ function FixedUpdate () {
 				wrongz=Mathf.PI-wrongz;
 				wrongz=wrongz*amplitude;
 			}
-			if(wrongz>maxThrust){wrongz=maxThrust;}
-			if(wrongz<0){wrongz=0;}
 		}
 		if(alphaz%360<180&&alphaz%360>0){
 			wrongz = sourceBlock.transform.rotation.eulerAngles.x*Mathf.PI/180;
@@ -109,11 +110,19 @@ function FixedUpdate () {
 				wrongz=wrongz/2;
 				wrongz=wrongz*amplitude;
 			}
-			if(wrongz>maxThrust){wrongz=maxThrust;}
-			if(wrongz<0){wrongz=0;}
 		}
+		var thrust=wrongx+wrongz;
+		if(thrust>maxThrust){thrust=maxThrust;}
+		if(thrust<0){thrust=0;}
 		var noise = Mathf.PerlinNoise(random, Time.time*10);
-		GetComponent.<Light>().intensity = Mathf.Lerp(minIntensity/maxThrust*(wrongx+wrongz), maxIntensity/maxThrust*(wrongx+wrongz), noise);
-		stabilizer.GetComponent.<Rigidbody>().AddForce(-transform.up * (wrongx+wrongz)  );
+		fire1.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire2.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire3.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire4.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire5.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire6.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		fire7.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
+		//GetComponent.<Light>().intensity = Mathf.Lerp(minIntensity/maxThrust*(wrongx+wrongz), maxIntensity/maxThrust*(wrongx+wrongz), noise);
+		stabilizer.GetComponent.<Rigidbody>().AddForce(-transform.up * thrust  );
 	}
 }
