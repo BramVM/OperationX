@@ -21,6 +21,13 @@ function setControleOptions (selectedBlock:GameObject) {
 	keyMap.SetActive(false);
 	if(buildingBlockInstance.name==thrustBlockName){
 		keyMap.SetActive(true);
+		var text="";
+		for(var i : int = 0; i < controles.Count; i++){
+			if(selectedBlock.GetComponent(blockPropperties).id==controles[i].id){
+				text=controles[i].key;
+			}
+		}
+		keyMap.GetComponent(InputField).text=text;
 	}
 }
 
@@ -32,9 +39,24 @@ function mapKey (){
  	}
  	saveControles();
 }
-function removeControle(){
+function removeControle(id:int){
+	for(var i : int = 0; i < controles.Count; i++){
+		if(id==controles[i].id){
+			 controles.RemoveAt(i);
+		}
+	}
 	saveControles();
 }
+
+function changeId(oldId:int, newId:int){
+	for(var i : int = 0; i < controles.Count; i++){
+		if(oldId==controles[i].id){
+			controles[i].id=newId;
+		}
+	}
+	saveControles();
+}
+
 function generateControles(){
 	for(var i : int = 0; i < controles.Count; i++){
 		var taggedBuildingBlocks= new GameObject[0];

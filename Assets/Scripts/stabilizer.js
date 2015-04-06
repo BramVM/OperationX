@@ -6,7 +6,6 @@ public var pom:Vector3;
 public var stabilizer:GameObject;
 public var sourceBlock:GameObject;
 public var maxThrust:float=100;
-private var amplitude:float=500;
 public var fire1: GameObject;
 public var fire2: GameObject;
 public var fire3: GameObject;
@@ -21,6 +20,10 @@ private var sx:float;
 private var z:float;
 private var sz:float;
 
+private var speedModifier=100;
+private var offsetModifier=0.1;
+private var prevRotation:Vector3;
+private var speed:Vector3;
 private var alphax:float;
 private var alphaz:float;
 private var thrust:float;
@@ -30,6 +33,7 @@ private var wrongz:float=0;
 private var minIntensity = 3;
 private var maxIntensity = 10;
 private var random : float;
+private var power :int;
 random = Random.Range(3,10);
 
 
@@ -58,62 +62,64 @@ public function init() {
 
 function FixedUpdate () {
 	if(sourceBlock!=null){
+		speed=sourceBlock.transform.rotation.eulerAngles-prevRotation;
+		if (speed.x>180){
+			speed.x=sourceBlock.transform.rotation.eulerAngles.x-360-prevRotation.x;
+		}
+		if (speed.x<-180){
+			speed.x=sourceBlock.transform.rotation.eulerAngles.x+360-prevRotation.x;
+		}
+		if (speed.y>180){
+			speed.y=sourceBlock.transform.rotation.eulerAngles.y-360-prevRotation.y;
+		}
+		if (speed.y<-180){
+			speed.y=sourceBlock.transform.rotation.eulerAngles.y+360-prevRotation.y;
+		}
+		if (speed.z>180){
+			speed.z=sourceBlock.transform.rotation.eulerAngles.z-360-prevRotation.z;
+		}
+		if (speed.z<-180){
+			speed.z=sourceBlock.transform.rotation.eulerAngles.z+360-prevRotation.z;
+		}
+		prevRotation=sourceBlock.transform.rotation.eulerAngles;
 		if(alphax%360<180&&alphax%360>0){
-			wrongx = sourceBlock.transform.rotation.eulerAngles.z*Mathf.PI/180;
-			if(wrongx<Mathf.PI){
-				wrongx=wrongx*-1;
-				wrongx=wrongx/2;
-				wrongx=wrongx*amplitude;
+			wrongx=sourceBlock.transform.rotation.eulerAngles.z;
+			if(wrongx>180){
+				wrongx=wrongx-360;
 			}
-			else{
-				wrongx=wrongx/2;
-				wrongx=Mathf.PI-wrongx;
-				wrongx=wrongx*amplitude;
-			}
+			wrongx=wrongx*Mathf.PI/90*100/(2*Mathf.PI)*offsetModifier+speed.z*speedModifier;
+			wrongx=-wrongx;
 		}
 		if(alphax%360<0&&alphax%360>-180){
-			wrongx = sourceBlock.transform.rotation.eulerAngles.z*Mathf.PI/180;
-			if(wrongx>Mathf.PI){
-				wrongx=wrongx/2;
-				wrongx=Mathf.PI-wrongx;
-				wrongx=wrongx*-1;
-				wrongx=wrongx*amplitude;
+			wrongx=sourceBlock.transform.rotation.eulerAngles.z;
+			if(wrongx>180){
+				wrongx=wrongx-360;
 			}
-			else{
-				wrongx=wrongx/2;
-				wrongx=wrongx*amplitude;
-			}
+			wrongx=wrongx*Mathf.PI/90*100/(2*Mathf.PI)*offsetModifier+speed.z*speedModifier;
 		}
 		
 		if(alphaz%360<0&&alphaz%360>-180){
-			wrongz = sourceBlock.transform.rotation.eulerAngles.x*Mathf.PI/180;
-			if(wrongz<Mathf.PI){
-				wrongz=wrongz*-1;
-				wrongz=wrongz/2;
-				wrongz=wrongz*amplitude;
+			wrongz=sourceBlock.transform.rotation.eulerAngles.x;
+			if(wrongz>180){
+				wrongz=wrongz-360;
 			}
-			else{
-				wrongz=wrongz/2;
-				wrongz=Mathf.PI-wrongz;
-				wrongz=wrongz*amplitude;
-			}
+			wrongz=wrongz*Mathf.PI/90*100/(2*Mathf.PI)*offsetModifier+speed.x*speedModifier;
+			wrongz=-wrongz;
 		}
 		if(alphaz%360<180&&alphaz%360>0){
-			wrongz = sourceBlock.transform.rotation.eulerAngles.x*Mathf.PI/180;
-			if(wrongz>Mathf.PI){
-				wrongz=wrongz/2;
-				wrongz=Mathf.PI-wrongz;
-				wrongz=wrongz*-1;
-				wrongz=wrongz*amplitude;
+			wrongz=sourceBlock.transform.rotation.eulerAngles.x;
+			if(wrongz>180){
+				wrongz=wrongz-360;
 			}
-			else{
-				wrongz=wrongz/2;
-				wrongz=wrongz*amplitude;
-			}
+			wrongz=wrongz*Mathf.PI/90*100/(2*Mathf.PI)*offsetModifier+speed.x*speedModifier;
 		}
-		var thrust=wrongx+wrongz;
+		thrust=thrust+wrongx+wrongz;
 		if(thrust>maxThrust){thrust=maxThrust;}
 		if(thrust<0){thrust=0;}
+		power=gameObject.FindWithTag("player").GetComponent(playerProperties).power;
+		if(thrust>power){
+			thrust=power;
+		}
 		var noise = Mathf.PerlinNoise(random, Time.time*10);
 		fire1.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
 		fire2.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
@@ -122,7 +128,7 @@ function FixedUpdate () {
 		fire5.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
 		fire6.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
 		fire7.GetComponent.<ParticleSystem>().startLifetime =thrust/1000;
-		//GetComponent.<Light>().intensity = Mathf.Lerp(minIntensity/maxThrust*(wrongx+wrongz), maxIntensity/maxThrust*(wrongx+wrongz), noise);
 		stabilizer.GetComponent.<Rigidbody>().AddForce(-transform.up * thrust  );
+		gameObject.FindWithTag("player").GetComponent(playerProperties).power=power-thrust;
 	}
 }

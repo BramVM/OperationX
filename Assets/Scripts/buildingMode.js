@@ -43,6 +43,8 @@ public var thrustBlock : GameObject;
 public var thrustBlockName : String;
 public var stabilizerBlock : GameObject;
 public var stabilizerBlockName : String;
+public var propellerBlock : GameObject;
+public var propellerBlockName : String;
 
 function blockSelectBlank (){
 	holding=blankBlock;
@@ -58,6 +60,12 @@ function blockSelectThrust (){
 
 function blockSelectStabilizer (){
 	holding=stabilizerBlock;
+	removalMode=false;
+	controleMode=false;
+}
+
+function blockSelectPropeller (){
+	holding=propellerBlock;
 	removalMode=false;
 	controleMode=false;
 }
@@ -173,6 +181,9 @@ function saveBuilding(){
 		if(taggedBuildingBlocks[i].name == stabilizerBlockName ){
 			buildingBlocks[i].type=3;
 		}
+		if(taggedBuildingBlocks[i].name == propellerBlockName ){
+			buildingBlocks[i].type=4;
+		}
 	}
 	//save data
 	var bf : BinaryFormatter = new BinaryFormatter();
@@ -198,6 +209,17 @@ function loadBuiling(){
 	}
 }
 
+function updateBlockIds(){
+	var taggedBuildingBlocks: GameObject[];
+	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
+	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
+		if(taggedBuildingBlocks[i].GetComponent(blockPropperties).id!=i){
+			GameObject.Find('Scripting').GetComponent(controleSettings).changeId(taggedBuildingBlocks[i].GetComponent(blockPropperties).id,i);
+			taggedBuildingBlocks[i].GetComponent(blockPropperties).id=i;
+		}
+	}
+}
+
 function buildFromData(){
 	var taggedBuildingBlocks: GameObject[];
 	taggedBuildingBlocks = player.FindGameObjectsWithTag ("buildingBlock");
@@ -206,7 +228,7 @@ function buildFromData(){
 	}
 	var blockInstance: GameObject;
 	var buildingBlock = new blockData();
-
+	player.GetComponent(playerProperties).blockCount=buildingBlocks.Count;
 	for(var i : int = 0; i < buildingBlocks.Count; i++){
 		buildingBlock=buildingBlocks[i];
 		var blockPosition = new Vector3();
@@ -223,6 +245,9 @@ function buildFromData(){
 				break;
 			case 3:
 				holding=stabilizerBlock;
+				break;
+			case 4:
+				holding=propellerBlock;
 				break;
 		}
 		var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
@@ -425,7 +450,7 @@ function calcPointOfMass(){
 	//Debug.Log(pointOfMass);
 	for(var i : int = 0; i < taggedBuildingBlocks.length; i++){
 		if(i!=0){
-			pointOfMass=pointOfMass+taggedBuildingBlocks[i].transform.position;
+			pointOfMass=pointOfMass+taggedBuildingBlocks[i].transform.position/**taggedBuildingBlocks[i].GetComponent(Rigidbody).mass*/;
 		}
 	}
 	pointOfMass=pointOfMass/taggedBuildingBlocks.length;
@@ -445,7 +470,6 @@ function enterBuildingMode(){
 }
 
 function exitBuildingMode(){
-
 	buildingMode=false;
 	removePlaceholders();
 	loadBuiling();
@@ -468,6 +492,7 @@ function Awake(){
 	initPosition.z=0;
 	blockInstance = Instantiate(sourceBlock,initPosition, initRotation)as GameObject;
 	blockInstance.transform.SetParent(player.transform,false);
+	player.GetComponent(playerProperties).blockCount=player.GetComponent(playerProperties).blockCount++;
 	sourceBlockInstance=blockInstance;
 	passSourceBlockInstance(blockInstance);
 }
@@ -486,7 +511,9 @@ function builder (){
 				var hitObject:GameObject=hit.collider.gameObject;
 				if(hitObject.tag=="buildingBlock"&&hit.collider.name!=sourceBlockName){
 					if(Input.GetMouseButtonDown(0)){
+						GameObject.Find('Scripting').GetComponent(controleSettings).removeControle(hitObject.GetComponent(blockPropperties).id);
 						DestroyImmediate(hitObject);
+						updateBlockIds();
 						saveBuilding();
 						calcPointOfMass();
 					}
@@ -517,10 +544,6 @@ function builder (){
 					position.z = position.z+(blockHeight*hit.normal.z);
 					position.x = position.x+(blockHeight*hit.normal.x);
 					position.y = position.y+(blockHeight*hit.normal.y);
-					//var blockHeightModifier = holding.GetComponent.<blockPropperties>().proportionalHeight;
-					//position.x = position.x-((1-blockHeightModifier)/2*blockHeight*hit.normal.x);
-					//position.y = position.y-((1-blockHeightModifier)/2*blockHeight*hit.normal.y);
-					//position.z = position.z-((1-blockHeightModifier)/2*blockHeight*hit.normal.z);
 					//if connectable
 					if( (Mathf.Round(hit.normal.y)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePY==true) || (Mathf.Round(hit.normal.y)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNY==true) || (Mathf.Round(hit.normal.x)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePX==true) || (Mathf.Round(hit.normal.x)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNX==true) || (Mathf.Round(hit.normal.z)>0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachablePZ==true) || (Mathf.Round(hit.normal.z)<0 && hit.collider.gameObject.GetComponent.<blockPropperties>().attachableNZ==true)){
 						//calc rotation
@@ -535,6 +558,8 @@ function builder (){
 						blockInstance = Instantiate(holding,position,rotation)as GameObject;
 						blockInstance.transform.SetParent(player.transform,false);
 						if(Input.GetMouseButtonDown(0)){
+							blockInstance.GetComponent(blockPropperties).id=player.GetComponent(playerProperties).blockCount;
+							player.GetComponent(playerProperties).blockCount=player.GetComponent(playerProperties).blockCount++;
 							saveBuilding();
 							calcPointOfMass();
 						}
