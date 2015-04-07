@@ -10,8 +10,6 @@ public var floorMaterial:Material;
 private var midTilePosition:Vector3;
 private var prevMidTilePosition:Vector3;
 private var tileInstance : GameObject;
-private var index:int = 0;
-private var tilesPerUpdate:int = 2;
 
 private var tileScale;
 private var grid_z : float;
@@ -43,7 +41,6 @@ function checkMidTilePosition(){
 			}
 		}
 	}
-	midTilePosition.y=midTilePosition.y;
 }
 function initTiles(){
 	checkMidTilePosition();
@@ -155,19 +152,10 @@ function drawHexagonMesh(tile:GameObject){
     tile.AddComponent.<MeshFilter>().mesh = stuff;
     tile.AddComponent.<MeshRenderer>();
     tile.GetComponent.<Renderer>().material=floorMaterial;
+    DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
+    //DynamicGI.SetEmissive(tile.GetComponent.<Renderer>(),  Color.red);
+    //tile.GetComponent.<Renderer>().material.SetColor ("_EmisColor",Color.red);
     tile.AddComponent.<MeshCollider>().sharedMesh = stuff;
-}
-function createTileIfNotExists(newPos:Vector3,existingTiles:GameObject[]){
-	var existing=false;
-	for(var i : int = index; i < existingTiles.length&&i<index+tilesPerUpdate; i++){
-		if(existingTiles[i].transform.position.x==newPos.x&&existingTiles[i].transform.position.z==newPos.z){
-			existing=true;
-		}
-	}
-	if(!existing){
-		tileInstance = Instantiate(tile,newPos,tile.transform.rotation )as GameObject;
-		drawHexagonMesh(tileInstance);
-	}
 }
 function MeshSetup(mid:Vector3){
 	var hexSide = 2*grid_x/Mathf.Tan(60*Mathf.PI/180);
@@ -211,86 +199,20 @@ function MeshSetup(mid:Vector3){
 }
 function generateWorld(){
 	checkMidTilePosition();
-	//if(prevMidTilePosition != midTilePosition){
-		/*var tiles: GameObject[];
+	var newpos:Vector3;
+	if(prevMidTilePosition != midTilePosition){
+		var tiles: GameObject[];
 		tiles = gameObject.FindGameObjectsWithTag ("tile");
-		for(var i : int = index; i<tiles.length && i<index+tilesPerUpdate; i++){
+		for(var i : int = 0; i<tiles.length; i++){
 			//destroy out of reach
 			if(Mathf.Sqrt(Mathf.Pow(tiles[i].transform.position.z-midTilePosition.z, 2)+Mathf.Pow(tiles[i].transform.position.x-midTilePosition.x, 2))>generatorRange+grid_x){
+				newpos.x=midTilePosition.x+prevMidTilePosition.x-tiles[i].transform.position.x;
+				newpos.z=midTilePosition.z+prevMidTilePosition.z-tiles[i].transform.position.z;
 				DestroyImmediate(tiles[i]);
+				tileInstance = Instantiate(tile,newpos,tile.transform.rotation )as GameObject;
+				drawHexagonMesh(tileInstance);
 			}
 		}
-		//Draw New Tiles
-		//topRightQuarter
-		var newPos = midTilePosition;
-		var zRowCount:int=0;
-		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			zRowCount++;
-			if(zRowCount%2==0){
-				newPos.x=newPos.x+grid_x;
-			}
-			var xCount:int=0;
-			while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-				createTileIfNotExists(newPos,tiles);
-				newPos.x=newPos.x+grid_x*2;
-				xCount++;
-			}
-			newPos.x=midTilePosition.x;
-			newPos.z=newPos.z+grid_z;
-		}
-		//topLeftQuarter
-		newPos = midTilePosition;
-		newPos.x=midTilePosition.x-grid_x*2;
-		zRowCount=0;
-		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			zRowCount++;
-			if(zRowCount%2==0){
-				newPos.x=newPos.x+grid_x;
-			}
-			while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-				createTileIfNotExists(newPos,tiles);
-				newPos.x=newPos.x-grid_x*2;
-			}
-			newPos.x=midTilePosition.x-grid_x*2;
-			newPos.z=newPos.z+grid_z;
-		}
-		//botRightQuarter
-		newPos = midTilePosition;
-		zRowCount=1;
-		newPos.z=newPos.z-grid_z;
-		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			zRowCount++;
-			if(zRowCount%2==0){
-				newPos.x=newPos.x+grid_x;
-			}
-			while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-				createTileIfNotExists(newPos,tiles);
-				newPos.x=newPos.x+grid_x*2;
-			}
-			newPos.x=midTilePosition.x*2;
-			newPos.z=newPos.z-grid_z;
-		}
-		//botLeftQuarter
-		newPos = midTilePosition;
-		newPos.x=midTilePosition.x-grid_x*2;
-		zRowCount=1;
-		newPos.z=newPos.z-grid_z;
-		while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-			zRowCount++;
-			if(zRowCount%2==0){
-				newPos.x=newPos.x+grid_x;
-			}
-			while(Mathf.Sqrt(Mathf.Pow(newPos.z-midTilePosition.z, 2)+Mathf.Pow(newPos.x-midTilePosition.x, 2))<generatorRange+grid_x){
-				createTileIfNotExists(newPos,tiles);
-				newPos.x=newPos.x-grid_x*2;
-			}
-			newPos.x=midTilePosition.x-grid_x*2;
-			newPos.z=newPos.z-grid_z;
-		}
-	//}
-	index=index+tilesPerUpdate;
-	if(index>=tiles.length){
-		index=0;
-	}*/
+	}
 	prevMidTilePosition = midTilePosition;
 };
