@@ -152,7 +152,28 @@ function drawHexagonMesh(tile:GameObject){
     tile.AddComponent.<MeshFilter>().mesh = stuff;
     tile.AddComponent.<MeshRenderer>();
     tile.GetComponent.<Renderer>().material=floorMaterial;
-    DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
+    var color:Vector4;
+    var frequency=0.002;
+	var amplitude=0.2/frequency;
+	var newSin:float;
+	newSin=amplitude*Mathf.Sin(((tile.transform.position.x+tile.transform.position.z)*frequency));
+	newSin=newSin+amplitude*Mathf.Sin(((tile.transform.position.x-tile.transform.position.z)*frequency));
+	if(newSin<0){
+	//red
+	color.x=1;
+    color.y=1-Mathf.Abs(newSin/amplitude);
+    color.z=1-Mathf.Abs(newSin/amplitude);
+    color.w=1;
+	}
+	else{
+	//blue
+	color.x=1-Mathf.Abs(newSin/amplitude);
+    color.y=1-Mathf.Abs(newSin/amplitude);
+    color.z=1;
+    color.w=1;
+	}
+    tile.GetComponent.<Renderer>().material.SetColor( "_EmissionColor", color);
+    //DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
     //DynamicGI.SetEmissive(tile.GetComponent.<Renderer>(),  Color.red);
     //tile.GetComponent.<Renderer>().material.SetColor ("_EmisColor",Color.red);
     tile.AddComponent.<MeshCollider>().sharedMesh = stuff;
