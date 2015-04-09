@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\hexaWorldGenerator.js">
     <Files>
-      <File FileName="Assets\Scripts\hexaWorldGenerator.js" Line="47" Column="19" />
+      <File FileName="Assets\Scripts\hexaWorldGenerator.js" Line="181" Column="70" />
       <File FileName="Assets\Scripts\stabilizer.js" Line="1" Column="1" />
       <File FileName="Assets\rotation.js" Line="1" Column="1" />
       <File FileName="Assets\Scripts\thrust.js" Line="1" Column="1" />

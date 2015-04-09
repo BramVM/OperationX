@@ -6,6 +6,7 @@ public var midTile:GameObject;
 public var grid_x : float;
 public var generatorRange:int;
 public var floorMaterial:Material;
+public var grass:Material;
 
 private var midTilePosition:Vector3;
 private var prevMidTilePosition:Vector3;
@@ -151,28 +152,33 @@ function drawHexagonMesh(tile:GameObject){
     stuff.uv = UV;
     tile.AddComponent.<MeshFilter>().mesh = stuff;
     tile.AddComponent.<MeshRenderer>();
-    tile.GetComponent.<Renderer>().material=floorMaterial;
+    var materials=new Material[2];
+    materials[1]=floorMaterial;
+    materials[0]=grass;
+    tile.GetComponent.<MeshRenderer>().materials=materials;
+    //var material1 : Material[]=
+    //tile.GetComponent.<Renderer>().material=floorMaterial;
     var color:Vector4;
     var frequency=0.002;
-	var amplitude=0.2/frequency;
 	var newSin:float;
-	newSin=amplitude*Mathf.Sin(((tile.transform.position.x+tile.transform.position.z)*frequency));
-	newSin=newSin+amplitude*Mathf.Sin(((tile.transform.position.x-tile.transform.position.z)*frequency));
+	newSin=Mathf.Sin(((tile.transform.position.x+tile.transform.position.z)*frequency));
+	newSin=newSin+Mathf.Sin(((tile.transform.position.x-tile.transform.position.z)*frequency));
 	if(newSin<0){
-	//red
-	color.x=1;
-    color.y=1-Mathf.Abs(newSin/amplitude);
-    color.z=1-Mathf.Abs(newSin/amplitude);
-    color.w=1;
+		//red
+		color.x=1;
+	    color.y=1-Mathf.Abs(newSin);
+	    color.z=1-Mathf.Abs(newSin);
+	    color.w=1;
 	}
 	else{
-	//blue
-	color.x=1-Mathf.Abs(newSin/amplitude);
-    color.y=1-Mathf.Abs(newSin/amplitude);
-    color.z=1;
-    color.w=1;
+		//blue
+		color.x=1-Mathf.Abs(newSin);
+	    color.y=1-Mathf.Abs(newSin);
+	    color.z=1;
+	    color.w=1;
 	}
-    tile.GetComponent.<Renderer>().material.SetColor( "_EmissionColor", color);
+    tile.GetComponent.<Renderer>().materials[1].SetColor( "_EmissionColor", color);
+    tile.GetComponent.<Renderer>().materials[0].SetFloat("_Cutoff", 2-Mathf.Abs(newSin));
     //DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
     //DynamicGI.SetEmissive(tile.GetComponent.<Renderer>(),  Color.red);
     //tile.GetComponent.<Renderer>().material.SetColor ("_EmisColor",Color.red);
