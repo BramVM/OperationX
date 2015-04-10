@@ -178,7 +178,7 @@ function drawHexagonMesh(tile:GameObject){
 	    color.w=1;
 	}
     tile.GetComponent.<Renderer>().materials[1].SetColor( "_EmissionColor", color);
-    tile.GetComponent.<Renderer>().materials[0].SetFloat("_Cutoff", 2-Mathf.Abs(newSin));
+    tile.GetComponent.<Renderer>().materials[0].SetFloat("_Cutoff", (2-Mathf.Abs(newSin))/1.7);
     //DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
     //DynamicGI.SetEmissive(tile.GetComponent.<Renderer>(),  Color.red);
     //tile.GetComponent.<Renderer>().material.SetColor ("_EmisColor",Color.red);
