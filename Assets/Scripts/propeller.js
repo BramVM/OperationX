@@ -6,5 +6,5 @@ function Start () {
 }
 
 function FixedUpdate () {
-	instance.GetComponent(Rigidbody).AddForce(transform.up * 100);
+	instance.GetComponent(Rigidbody).AddForce(instance.transform.forward * 100);
 }
