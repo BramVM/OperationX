@@ -6,7 +6,6 @@ public var midTile:GameObject;
 public var grid_x : float;
 public var generatorRange:int;
 public var floorMaterial:Material;
-public var grass:Material;
 
 private var midTilePosition:Vector3;
 private var prevMidTilePosition:Vector3;
@@ -152,12 +151,7 @@ function drawHexagonMesh(tile:GameObject){
     stuff.uv = UV;
     tile.AddComponent.<MeshFilter>().mesh = stuff;
     tile.AddComponent.<MeshRenderer>();
-    var materials=new Material[2];
-    materials[1]=floorMaterial;
-    materials[0]=grass;
-    tile.GetComponent.<MeshRenderer>().materials=materials;
-    //var material1 : Material[]=
-    //tile.GetComponent.<Renderer>().material=floorMaterial;
+    tile.GetComponent.<Renderer>().material=floorMaterial;
     var color:Vector4;
     var frequency=0.002;
 	var newSin:float;
@@ -168,20 +162,17 @@ function drawHexagonMesh(tile:GameObject){
 		color.x=1;
 	    color.y=1-Mathf.Abs(newSin);
 	    color.z=1-Mathf.Abs(newSin);
-	    color.w=1;
+	    color.w=1-Mathf.Abs(newSin);
 	}
 	else{
 		//blue
 		color.x=1-Mathf.Abs(newSin);
 	    color.y=1-Mathf.Abs(newSin);
 	    color.z=1;
-	    color.w=1;
+	    color.w=1-Mathf.Abs(newSin);
 	}
-    tile.GetComponent.<Renderer>().materials[1].SetColor( "_EmissionColor", color);
-    tile.GetComponent.<Renderer>().materials[0].SetFloat("_Cutoff", (2-Mathf.Abs(newSin))/1.7);
-    //DynamicGI.SetEmissive(GetComponent.<Renderer>(), new Color(1f, 0.1f, 0.5f, 1.0f) * 0);
-    //DynamicGI.SetEmissive(tile.GetComponent.<Renderer>(),  Color.red);
-    //tile.GetComponent.<Renderer>().material.SetColor ("_EmisColor",Color.red);
+    tile.GetComponent.<Renderer>().material.SetColor( "_EmissionColor", color);
+    tile.GetComponent.<Renderer>().material.SetFloat("_EmissionScaleUI", 1-Mathf.Abs(newSin));
     tile.AddComponent.<MeshCollider>().sharedMesh = stuff;
 }
 function MeshSetup(mid:Vector3){
