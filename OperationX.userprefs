@@ -1,8 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\propeller.js">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\power.js">
     <Files>
-      <File FileName="Assets\Scripts\propeller.js" Line="9" Column="70" />
+      <File FileName="Assets\Scripts\power.js" Line="5" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
